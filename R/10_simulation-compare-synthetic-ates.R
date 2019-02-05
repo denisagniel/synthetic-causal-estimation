@@ -168,7 +168,9 @@ sim_res <- Q(tree_sim,
                              strat_ate),
                            B = 200,
                            d = 'ks'),
-                         n_jobs = 100
+                         n_jobs = 100,
+             job_name = 'comparesim',
+             memory = 16000
 )
 
 theta_res <- map(sim_res, 'thetas') %>%
