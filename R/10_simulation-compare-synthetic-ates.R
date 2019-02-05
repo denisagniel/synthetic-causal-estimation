@@ -150,13 +150,12 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
 sim_parameters <- expand.grid(
   run = 1:10,
   j = 1:4,
-  n = c(50, 100, 250, 500),
+  n = c(50, 100),
   d = c('ks', 'ld')
 )
 sim_parameters <- sim_parameters %>%
   mutate(sim = as.character(1:nrow(sim_parameters)))
 
-options(clustermq.scheduler = "multicore")
 sim_res <- Q(tree_sim, 
                          j = sim_parameters$j,
                          n = sim_parameters$n,
@@ -169,7 +168,7 @@ sim_res <- Q(tree_sim,
                              strat_ate),
                            B = 200,
                            d = 'ks'),
-                         n_jobs = 50
+                         n_jobs = 100
 )
 
 theta_res <- map(sim_res, 'thetas') %>%
