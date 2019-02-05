@@ -169,7 +169,6 @@ sim_res <- Q(tree_sim,
                            B = 200,
                            d = 'ks'),
                          n_jobs = 100,
-             job_name = 'comparesim',
              memory = 16000
 )
 
