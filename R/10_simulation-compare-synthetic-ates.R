@@ -169,8 +169,7 @@ sim_res <- Q(tree_sim,
                            B = 200,
                            d = 'ks'),
                          n_jobs = 500,
-             memory = 16000,
-             time_amt = "12:00:00"
+             memory = 16000
 )
 
 theta_res <- map(sim_res, 'thetas') %>%
