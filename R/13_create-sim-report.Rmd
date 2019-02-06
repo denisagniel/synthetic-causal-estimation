@@ -1,0 +1,43 @@
+---
+title: "$G_n$ comparison simulation results"
+output:
+  github_document
+---
+
+In these simulations, I consider six different types of possible ways of creating synthetic estimators.
+
+- *Old*: this is the original way we have always done things, using raw differences: $\hat{\Delta} = \hat{\theta}_i - \hat{\theta}_0$. 
+- *Boot*: this 
+
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(here)
+library(glue)
+
+theta1 <- read_csv(here(
+  'results/comparison_sim_thetas_ks_1.csv'
+)) %>%
+  mutate(n = rep(c(50, 100, 250, 500), each = 500*6),
+         j = 1,
+         d = 'ks')
+theta2 <-  read_csv(here(
+  'results/comparison_sim_thetas_ks_2.csv'
+)) %>%
+  mutate(n = rep(c(50, 100, 250, 500), each = 500*6),
+         j = 2,
+         d = 'ks')
+
+all_theta <- bind_rows(
+  list(theta1, theta2)
+)
+mse_res <- all_theta %>%
+        group_by(j, n, d, type) %>%
+        summarise(mse = mean((ate - 40)^2))
+      
+      ggplot(mse_res, aes(x = type, y = mse)) +
+        geom_col() +
+        facet_wrap(n ~ j, scales = 'free')
+
+
+
+```
