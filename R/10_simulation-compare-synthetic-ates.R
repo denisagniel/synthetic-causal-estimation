@@ -179,6 +179,9 @@ for (dd in c('ks', 'ld')) {
                    memory = 8000,
                    fail_on_error = FALSE
       )
+      saveRDS(sim_res, 
+              here(glue('results/comparison_sim_{dd}_{jj}.rds'))
+      )
       theta_res <- map(sim_res, 'thetas') %>%
         bind_rows(.id = 'sim') %>%
         inner_join(this_sim) %>%
