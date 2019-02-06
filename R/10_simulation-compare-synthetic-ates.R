@@ -166,14 +166,14 @@ for (dd in c('ks', 'ld')) {
                    j = this_sim$j,
                    n = this_sim$n,
                    s = this_sim$run,
-                   d = this_sim$d,
                    const = list(
                      ate_list = list(
                        ipw2_ate,
                        regr_ate,
                        dr_ate,
                        strat_ate),
-                     B = 200),
+                     B = 200,
+                     d = dd),
                    n_jobs = 150,
                    memory = 8000,
                    fail_on_error = FALSE
