@@ -16,6 +16,7 @@ library(here)
 library(synthate)
 library(purrr)
 library(readr)
+library(glue)
 
 tree_sim <- function(ate_list, n, j, d, B, s) {
   library(splines)
