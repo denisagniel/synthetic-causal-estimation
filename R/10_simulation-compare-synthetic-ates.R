@@ -59,7 +59,7 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
   predict_regr <- function(d) {
     unlist(predict(grf_fit, newdata = d))
   }
-  browser()
+  # browser()
   resample_thetas <- 
     resample_fn(dat = this_data,
                 predfn = predict_regr,
