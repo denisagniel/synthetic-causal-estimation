@@ -154,14 +154,15 @@ sim_parameters <- expand.grid(
   n = c(50, 100, 250, 500),
   d = c('ks', 'ld')
 )
-sim_parameters <- sim_parameters %>%
-  mutate(sim = as.character(1:nrow(sim_parameters)))
+sim_parameters <- sim_parameters
 
 for (dd in c('ks', 'ld')) {
     for (jj in 1:4) {
       this_sim <- sim_parameters %>%
         filter(j == jj,
-               d == dd)
+               d == dd) 
+      this_sim <- this_sim %>%
+        mutate(sim = as.character(1:nrow(this_sim)))
       sim_res <- Q(tree_sim, 
                    j = this_sim$j,
                    n = this_sim$n,
@@ -180,7 +181,7 @@ for (dd in c('ks', 'ld')) {
       )
       theta_res <- map(sim_res, 'thetas') %>%
         bind_rows(.id = 'sim') %>%
-        inner_join(sim_parameters) %>%
+        inner_join(this_sim) %>%
         select(-(theta_0:shrunk))
       write_csv(theta_res,
                 here(
@@ -196,7 +197,7 @@ for (dd in c('ks', 'ld')) {
       
       b_res <- map(sim_res, 'bs') %>%
         bind_rows(.id = 'sim') %>%
-        inner_join(sim_parameters) %>%
+        inner_join(this_sim) %>%
         select(-(theta_0:shrunk))
       write_csv(b_res, here(
         glue('results/comparison_sim_bs_{dd}_{jj}.csv')
