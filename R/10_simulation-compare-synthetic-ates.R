@@ -148,8 +148,8 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
 }
 
 sim_parameters <- expand.grid(
-  run = 1:1000,
-  j = 1:4,
+  run = 1:500,
+  j = 1:3,
   n = c(50, 100, 250, 500),
   d = c('ks', 'ld')
 )
@@ -169,7 +169,8 @@ sim_res <- Q(tree_sim,
                            B = 200,
                            d = 'ks'),
                          n_jobs = 500,
-             memory = 16000
+             memory = 16000,
+             fail_on_error = FALSE
 )
 
 theta_res <- map(sim_res, 'thetas') %>%
