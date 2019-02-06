@@ -174,7 +174,7 @@ for (dd in c('ks', 'ld')) {
                        dr_ate,
                        strat_ate),
                      B = 200),
-                   n_jobs = 250,
+                   n_jobs = 150,
                    memory = 8000,
                    fail_on_error = FALSE
       )
