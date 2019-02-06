@@ -185,7 +185,7 @@ for (dd in c('ks', 'ld')) {
         select(-(theta_0:shrunk))
       write_csv(theta_res,
                 here(
-                  'results/comparison_sim_thetas.csv'
+                  glue('results/comparison_sim_thetas_{d}_{n}_{j}.csv')
                 ))
       mse_res <- theta_res %>%
         group_by(j, n, d, type) %>%
@@ -200,7 +200,7 @@ for (dd in c('ks', 'ld')) {
         inner_join(sim_parameters) %>%
         select(-(theta_0:shrunk))
       write_csv(b_res, here(
-        'results/comparison_sim_bs.csv'
+        glue('results/comparison_sim_bs_{d}_{n}_{j}.csv')
       ))
       
       b_sum <- b_res %>%
