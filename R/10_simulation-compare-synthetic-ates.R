@@ -158,24 +158,22 @@ sim_parameters <- sim_parameters %>%
   mutate(sim = as.character(1:nrow(sim_parameters)))
 
 for (dd in c('ks', 'ld')) {
-  for (nn in c(50, 100, 250, 500)) {
     for (jj in 1:4) {
       this_sim <- sim_parameters %>%
         filter(j == jj,
-               n == nn,
                d == dd)
       sim_res <- Q(tree_sim, 
                    j = this_sim$j,
                    n = this_sim$n,
                    s = this_sim$run,
+                   d = this_sim$d,
                    const = list(
                      ate_list = list(
                        ipw2_ate,
                        regr_ate,
                        dr_ate,
                        strat_ate),
-                     B = 200,
-                     d = 'ks'),
+                     B = 200),
                    n_jobs = 250,
                    memory = 8000,
                    fail_on_error = FALSE
@@ -186,7 +184,7 @@ for (dd in c('ks', 'ld')) {
         select(-(theta_0:shrunk))
       write_csv(theta_res,
                 here(
-                  glue('results/comparison_sim_thetas_{d}_{n}_{j}.csv')
+                  glue('results/comparison_sim_thetas_{d}_{j}.csv')
                 ))
       mse_res <- theta_res %>%
         group_by(j, n, d, type) %>%
@@ -201,7 +199,7 @@ for (dd in c('ks', 'ld')) {
         inner_join(sim_parameters) %>%
         select(-(theta_0:shrunk))
       write_csv(b_res, here(
-        glue('results/comparison_sim_bs_{d}_{n}_{j}.csv')
+        glue('results/comparison_sim_bs_{d}_{j}.csv')
       ))
       
       b_sum <- b_res %>%
@@ -212,7 +210,6 @@ for (dd in c('ks', 'ld')) {
         geom_col(position = 'dodge') +
         facet_wrap(n ~ j, scales = 'free'))
       
-    }
   }
 }
 
