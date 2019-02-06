@@ -4,15 +4,22 @@ output:
   github_document
 ---
 
-In these simulations, I consider six different types of possible ways of creating synthetic estimators.
+In these simulations, I consider six different types of possible ways of creating synthetic estimators. When $\theta_0$ is specified, it is the DR. Kang and Shafer is used throughout.
 
 - *Old*: this is the original way we have always done things, using raw differences: $\hat{\Delta} = \hat{\theta}_i - \hat{\theta}_0$. 
-- *Boot*: this 
+- *Boot*: this replaces $\hat{\theta}_i$ with the mean of its bootstrapped versions $\bar{\theta}^*_i$
+- *All_boot*: this replaces both quantities with their bootstrapped versions: $\hat{\Delta} = \bar{\theta}^*_i - \bar{\theta}^*_0$
+- *Gn*: this generates data using a regression forest to predict the outcome and randomly bootstrapping the covariates (and their associated predicted $y$s) and also separately bootstrapping their errors. The bias is estimated by comparing to the regression-forest-based 'true' ATE.
+- *Null*: this is the so-called tree-based method we've been using, where we remove the treatment effect and then bootstrap, and compare to a null ATE.
+- *Hybrid_gn*: this uses the typical bootstrap, but the bias is estimated by comparing to the regression-forest-based 'true' ATE. It is a hybrid of the previous two methods.
 
-```{r echo = FALSE, message = FALSE, warning = FALSE}
+### MSE comparison
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 8}
 library(tidyverse)
 library(here)
 library(glue)
+library(knitr)
 
 theta1 <- read_csv(here(
   'results/comparison_sim_thetas_ks_1.csv'
@@ -38,6 +45,38 @@ mse_res <- all_theta %>%
         geom_col() +
         facet_wrap(n ~ j, scales = 'free')
 
+kable(mse_res)
 
+```
 
+### Comparing the coefficients
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
+b1 <- read_csv(here(
+    'results/comparison_sim_bs_ks_1.csv'
+)) %>%
+  mutate(n = rep(c(50, 100, 250, 500), each = 500*6*4),
+         j = 1,
+         d = 'ks')
+b2 <-  read_csv(here(
+  'results/comparison_sim_bs_ks_2.csv'
+)) %>%
+  mutate(n = rep(c(50, 100, 250, 500), each = 500*6*4),
+         j = 2,
+         d = 'ks')
+
+all_b <- bind_rows(
+  list(b1, b2)
+)
+b_sum <- all_b %>%
+        group_by(j, n, d, est, type) %>%
+        summarise(bhat = mean(b),
+                  bvar = var(b))
+      print(ggplot(b_sum, aes(x = est, y = bhat, group = type, fill = type)) +
+        geom_col(position = 'dodge') +
+        facet_wrap(n ~ j, scales = 'free'))
+      
+      print(ggplot(b_sum, aes(x = n, y = bvar, group = est, fill = est)) +
+        geom_col(position = 'dodge') +
+        facet_wrap(type ~ j, scales = 'free'))
 ```
