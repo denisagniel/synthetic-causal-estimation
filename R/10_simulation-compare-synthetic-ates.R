@@ -156,13 +156,13 @@ sim_parameters <- expand.grid(
 sim_parameters <- sim_parameters %>%
   mutate(sim = as.character(1:nrow(sim_parameters)))
 
-for (d in c('ks', 'ld')) {
-  for (n in c(50, 100, 250, 500)) {
-    for (j in 1:4) {
+for (dd in c('ks', 'ld')) {
+  for (nn in c(50, 100, 250, 500)) {
+    for (jj in 1:4) {
       this_sim <- sim_parameters %>%
-        filter(j == j,
-               n == n,
-               d == d)
+        filter(j == jj,
+               n == nn,
+               d == dd)
       sim_res <- Q(tree_sim, 
                    j = this_sim$j,
                    n = this_sim$n,
