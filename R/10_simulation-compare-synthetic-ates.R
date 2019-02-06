@@ -156,52 +156,65 @@ sim_parameters <- expand.grid(
 sim_parameters <- sim_parameters %>%
   mutate(sim = as.character(1:nrow(sim_parameters)))
 
-sim_res <- Q(tree_sim, 
-                         j = sim_parameters$j,
-                         n = sim_parameters$n,
-                         s = sim_parameters$run,
-                         const = list(
-                           ate_list = list(
-                             ipw2_ate,
-                             regr_ate,
-                             dr_ate,
-                             strat_ate),
-                           B = 200,
-                           d = 'ks'),
-                         n_jobs = 500,
-             memory = 16000,
-             fail_on_error = FALSE
-)
+for (d in c('ks', 'ld')) {
+  for (n in c(50, 100, 250, 500)) {
+    for (j in 1:4) {
+      this_sim <- sim_parameters %>%
+        filter(j == j,
+               n == n,
+               d == d)
+      sim_res <- Q(tree_sim, 
+                   j = this_sim$j,
+                   n = this_sim$n,
+                   s = this_sim$run,
+                   const = list(
+                     ate_list = list(
+                       ipw2_ate,
+                       regr_ate,
+                       dr_ate,
+                       strat_ate),
+                     B = 200,
+                     d = 'ks'),
+                   n_jobs = 250,
+                   memory = 8000,
+                   fail_on_error = FALSE
+      )
+      theta_res <- map(sim_res, 'thetas') %>%
+        bind_rows(.id = 'sim') %>%
+        inner_join(sim_parameters) %>%
+        select(-(theta_0:shrunk))
+      write_csv(theta_res,
+                here(
+                  'results/comparison_sim_thetas.csv'
+                ))
+      mse_res <- theta_res %>%
+        group_by(j, n, d, type) %>%
+        summarise(mse = mean((ate - 40)^2))
+      
+      print(ggplot(mse_res, aes(x = type, y = mse)) +
+        geom_col() +
+        facet_wrap(n ~ j, scales = 'free'))
+      
+      b_res <- map(sim_res, 'bs') %>%
+        bind_rows(.id = 'sim') %>%
+        inner_join(sim_parameters) %>%
+        select(-(theta_0:shrunk))
+      write_csv(b_res, here(
+        'results/comparison_sim_bs.csv'
+      ))
+      
+      b_sum <- b_res %>%
+        group_by(j, n, d, est, type) %>%
+        summarise(bhat = mean(b),
+                  bvar = var(b))
+      print(ggplot(b_sum, aes(x = est, y = bhat, group = type, fill = type)) +
+        geom_col(position = 'dodge') +
+        facet_wrap(n ~ j, scales = 'free'))
+      
+    }
+  }
+}
 
-theta_res <- map(sim_res, 'thetas') %>%
-  bind_rows(.id = 'sim') %>%
-  inner_join(sim_parameters) %>%
-  select(-(theta_0:shrunk))
-write_csv(theta_res,
-          here(
-  'results/comparison_sim_thetas.csv'
-))
-mse_res <- theta_res %>%
-  group_by(j, n, d, type) %>%
-  summarise(mse = mean((ate - 40)^2))
 
-ggplot(mse_res, aes(x = type, y = mse)) +
-  geom_col() +
-  facet_wrap(n ~ j, scales = 'free')
 
-b_res <- map(sim_res, 'bs') %>%
-  bind_rows(.id = 'sim') %>%
-  inner_join(sim_parameters) %>%
-  select(-(theta_0:shrunk))
-write_csv(b_res, here(
-  'results/comparison_sim_bs.csv'
-))
-
-b_sum <- b_res %>%
-  group_by(j, n, d, est, type) %>%
-  summarise(bhat = mean(b),
-            bvar = var(b))
-ggplot(b_sum, aes(x = est, y = bhat, group = type, fill = type)) +
-  geom_col(position = 'dodge') +
-  facet_wrap(n ~ j, scales = 'free')
 sessionInfo()
