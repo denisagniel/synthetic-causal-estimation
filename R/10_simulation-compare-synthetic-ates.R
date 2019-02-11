@@ -151,12 +151,12 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
 sim_parameters <- expand.grid(
   run = 1:500,
   j = 1:3,
-  n = c(50, 100, 250, 500),
-  d = c('ks', 'ld')
+  n = c(500, 2000, 8000),
+  d = c('ld')
 )
 sim_parameters <- sim_parameters
 
-for (dd in c('ks', 'ld')) {
+for (dd in c('ld')) {
     for (jj in 1:4) {
       this_sim <- sim_parameters %>%
         filter(j == jj,
@@ -175,8 +175,8 @@ for (dd in c('ks', 'ld')) {
                        strat_ate),
                      B = 200,
                      d = dd),
-                   n_jobs = 150,
-                   memory = 8000,
+                   n_jobs = 250,
+                   memory = 1000,
                    fail_on_error = FALSE
       )
       saveRDS(sim_res, 
@@ -192,7 +192,7 @@ for (dd in c('ks', 'ld')) {
                 ))
       mse_res <- theta_res %>%
         group_by(j, n, d, type) %>%
-        summarise(mse = mean((ate - 40)^2))
+        summarise(mse = mean((ate - 2)^2))
       
       print(ggplot(mse_res, aes(x = type, y = mse)) +
         geom_col() +
