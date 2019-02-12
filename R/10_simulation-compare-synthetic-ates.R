@@ -52,17 +52,24 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
                             outcome_fm = stringr::str_c('d + ', outcome_fm),
                             outcome_fam = outcome_fam)
   print('initial thetas estimated...')
-  X <- this_data %>% select(one_of(cov_ids), d)
+  X <- this_data %>% select(one_of(cov_ids))
+  W <- this_data %>% pull(d)
   Y <- this_data$y
-  grf_fit <- regression_forest(X = X, Y = Y)
+  grf_fit <- causal_forest(X = X, Y = Y, W = W)
+  rf_fit <- regression_forest(X = cbind(X, W), Y = Y)
+  # browser()
   print('prediction model fit...')
-  predict_regr <- function(d) {
-    unlist(predict(grf_fit, newdata = d))
+  predict_delta <- function(d) {
+    unlist(predict(grf_fit, newdata = d)[,1])
+  }
+  predict_y <- function(d) {
+    unlist(predict(rf_fit, newdata = d))
   }
   # browser()
   resample_thetas <- 
     resample_fn(dat = this_data,
-                predfn = predict_regr,
+                ypredfn = predict_y,
+                dpredfn = predict_delta,
                 B = B,
                 ate_list = ate_list,
                 outcome_fm = outcome_fm,
@@ -107,8 +114,7 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
   #--------------------------
   ## gn method
   gn_ate_0 <- mean(
-    predict_regr(this_data %>% mutate(d = 1)) - 
-      predict_regr(this_data %>% mutate(d = 0))
+    predict_delta(this_data)
   )
   gn_way <- combine_estimators(thetahat,
                                boot_ests = gn_theta,
@@ -124,24 +130,43 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
                                            bias_type = 'bootstrap',
                                            ate_0 = gn_ate_0)
   
+  #----------------------------
+  ## no bias
+  #---------------------------
+  no_bias_way <- combine_estimators(thetahat,
+                                    boot_ests = boot_theta,
+                                    name_0 = 'ate_dr',
+                                    bias_type = 'none')
+  #----------------------------
+  ## shrunk bias
+  #---------------------------
+  shrunk_bias_way <- combine_estimators(thetahat,
+                                    boot_ests = boot_theta,
+                                    name_0 = 'ate_dr',
+                                    bias_type = 'shrunk',
+                                    n = n)
+  
   alvvays <- list(
     old_way,
     boot_way,
     all_boot_way,
     null_way,
     gn_way,
-    hybrid_boot_gn_way
+    hybrid_boot_gn_way,
+    no_bias_way,
+    shrunk_bias_way
   )
   
   all_synthetic_thetas <- map(alvvays, 'ate_res') %>%
     bind_rows %>%
     filter(!shrunk) %>%
-    mutate(type = c('old', 'boot', 'all_boot', 'null', 'gn', 'hybrid_gn'))
+    mutate(type = c('old', 'boot', 'all_boot', 'null', 'gn', 'hybrid_gn', 'none', 'shrunk'),
+           true_ate = gen_mod$true_ate)
   
   all_bs <- map(alvvays, 'b_res') %>%
     bind_rows %>%
     filter(!shrunk) %>%
-    mutate(type = rep(c('old', 'boot', 'all_boot', 'null', 'gn', 'hybrid_gn'), each = 4))
+    mutate(type = rep(c('old', 'boot', 'all_boot', 'null', 'gn', 'hybrid_gn', 'none', 'shrunk'), each = 4))
   
   return(list(thetas = all_synthetic_thetas,
               bs = all_bs))
@@ -154,7 +179,16 @@ sim_parameters <- expand.grid(
   n = c(500, 2000, 8000),
   d = c('ld')
 )
-sim_parameters <- sim_parameters
+# tree_sim(j = 1,
+#                   n = 100,
+#                   s = 12,
+#                   ate_list = list(
+#                     ipw2_ate,
+#                     regr_ate,
+#                     dr_ate,
+#                     strat_ate),
+#                   B = 20,
+#                   d = 'ld')
 
 for (dd in c('ld')) {
     for (jj in 1:4) {
@@ -163,6 +197,17 @@ for (dd in c('ld')) {
                d == dd) 
       this_sim <- this_sim %>%
         mutate(sim = as.character(1:nrow(this_sim)))
+ 
+      tree_sim(j = jj,
+               n = 500,
+               s = 1,
+               ate_list = list(
+                 ipw2_ate,
+                 regr_ate,
+                 dr_ate,
+                 strat_ate),
+               B = 20,
+               d = dd)
       sim_res <- Q(tree_sim, 
                    j = this_sim$j,
                    n = this_sim$n,
@@ -175,7 +220,7 @@ for (dd in c('ld')) {
                        strat_ate),
                      B = 200,
                      d = dd),
-                   n_jobs = 250,
+                   n_jobs = 500,
                    memory = 8000,
                    fail_on_error = FALSE
       )
