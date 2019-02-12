@@ -176,7 +176,7 @@ for (dd in c('ld')) {
                      B = 200,
                      d = dd),
                    n_jobs = 250,
-                   memory = 1000,
+                   memory = 8000,
                    fail_on_error = FALSE
       )
       saveRDS(sim_res, 
