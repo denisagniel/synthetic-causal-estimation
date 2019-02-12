@@ -60,7 +60,7 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
   # browser()
   print('prediction model fit...')
   predict_delta <- function(d) {
-    unlist(predict(grf_fit, newdata = d)[,1])
+    as.vector(predict(grf_fit, newdata = d)$predictions)
   }
   predict_y <- function(d) {
     unlist(predict(rf_fit, newdata = d))
@@ -197,17 +197,7 @@ for (dd in c('ld')) {
                d == dd) 
       this_sim <- this_sim %>%
         mutate(sim = as.character(1:nrow(this_sim)))
- 
-      tree_sim(j = jj,
-               n = 500,
-               s = 1,
-               ate_list = list(
-                 ipw2_ate,
-                 regr_ate,
-                 dr_ate,
-                 strat_ate),
-               B = 20,
-               d = dd)
+
       sim_res <- Q(tree_sim, 
                    j = this_sim$j,
                    n = this_sim$n,
