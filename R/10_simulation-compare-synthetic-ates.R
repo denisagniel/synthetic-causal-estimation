@@ -31,6 +31,7 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
     glue::glue('Sample size is {n}; the outcome is {(j %in% c(1,3))}; the PS is {(j %in% c(1,2))}; the DGP is {d}; the seed is {s}.')
   )
   set.seed(s)
+  # browser()
   gen_mod <- generate_data(n = n, dgp = d, 
                            correct_outcome = (j %in% c(1,3)),
                            correct_ps = (j %in% 1:2))
@@ -55,12 +56,12 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
   X <- this_data %>% select(one_of(cov_ids))
   W <- this_data %>% pull(d)
   Y <- this_data$y
-  grf_fit <- causal_forest(X = X, Y = Y, W = W)
-  rf_fit <- regression_forest(X = cbind(X, W), Y = Y)
+  
+  rf_fit <- randomForest::randomForest(as.formula(stringr::str_c('y ~ d + ', outcome_fm)), data = this_data)
   # browser()
   print('prediction model fit...')
   predict_delta <- function(d) {
-    as.vector(predict(grf_fit, newdata = d)$predictions)
+    gen_mod$true_ate
   }
   predict_y <- function(d) {
     unlist(predict(rf_fit, newdata = d))
@@ -175,23 +176,22 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
 
 sim_parameters <- expand.grid(
   run = 1:500,
-  j = 1:3,
+  j = c(2,3,1),
   n = c(500, 2000, 8000),
-  d = c('ld')
+  d = c('ls', 'iw')
 )
-# tree_sim(j = 1,
-#                   n = 100,
-#                   s = 12,
-#                   ate_list = list(
-#                     ipw2_ate,
-#                     regr_ate,
-#                     dr_ate,
-#                     strat_ate),
-#                   B = 20,
-#                   d = 'ld')
-
-for (dd in c('ld')) {
-    for (jj in 1:4) {
+tree_sim(j = 2,
+                  n = 500,
+                  s = 1,
+                  ate_list = list(
+                    ipw2_ate,
+                    regr_ate,
+                    dr_ate,
+                    strat_ate),
+                  B = 20,
+                  d = 'ls')
+for (jj in c(2,3,1)) {
+for (dd in c('ld', 'ls')) {
       this_sim <- sim_parameters %>%
         filter(j == jj,
                d == dd) 
@@ -211,7 +211,7 @@ for (dd in c('ld')) {
                      B = 200,
                      d = dd),
                    n_jobs = 500,
-                   memory = 8000,
+                   memory = 4000,
                    fail_on_error = FALSE
       )
       saveRDS(sim_res, 
