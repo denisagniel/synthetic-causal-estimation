@@ -176,7 +176,7 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
 
 sim_parameters <- expand.grid(
   run = 1:500,
-  j = c(2,3,1),
+  j = 1:4,
   n = c(500, 2000, 8000),
   d = c('ls', 'iw')
 )
@@ -210,7 +210,7 @@ for (dd in c('ls', 'iw')) {
                      B = 200,
                      d = dd),
                    n_jobs = 500,
-                   memory = 4000,
+                   memory = 2000,
                    fail_on_error = FALSE
       )
       saveRDS(sim_res, 
@@ -249,7 +249,7 @@ for (dd in c('ls', 'iw')) {
         facet_wrap(n ~ j, scales = 'free'))
       
   }
-}
+
 
 
 
