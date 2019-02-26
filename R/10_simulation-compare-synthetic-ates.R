@@ -191,11 +191,9 @@ sim_parameters <- expand.grid(
 #                     strat_ate),
 #                   B = 20,
 #                   d = 'ls')
-for (jj in c(2,3,1)) {
 for (dd in c('ls', 'iw')) {
       this_sim <- sim_parameters %>%
-        filter(j == jj,
-               d == dd) 
+        filter(d == dd) 
       this_sim <- this_sim %>%
         mutate(sim = as.character(1:nrow(this_sim)))
 
