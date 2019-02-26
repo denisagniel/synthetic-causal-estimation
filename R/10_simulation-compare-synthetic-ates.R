@@ -180,6 +180,7 @@ sim_parameters <- expand.grid(
   n = c(500, 2000, 8000),
   d = c('ls', 'iw')
 )
+
 # tree_sim(j = 2,
 #                   n = 500,
 #                   s = 1,
