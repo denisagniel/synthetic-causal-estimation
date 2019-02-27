@@ -11,13 +11,11 @@ In these simulations, I consider eight different types of possible ways of creat
 - *Shrunk*: this uses the raw differences but scales them by $n$: $\hat{\Delta} = n^{-1}(\hat{\theta}_i - \hat{\theta}_0)$.
 - *Boot*: this replaces $\hat{\theta}_i$ with the mean of its bootstrapped versions $\bar{\theta}^*_i$
 - *All_boot*: this replaces both quantities with their bootstrapped versions: $\hat{\Delta} = \bar{\theta}^*_i - \bar{\theta}^*_0$
-- *Gn*: this generates data using a regression forest to predict the outcome and randomly bootstrapping the covariates (and their associated predicted $y$s) and also separately bootstrapping their errors. The bias is estimated by comparing to the regression-forest-based 'true' ATE.
-- *Null*: this is the so-called tree-based method we've been using, where we remove the treatment effect and then bootstrap, and compare to a null ATE.
-- *Hybrid_gn*: this uses the typical bootstrap, but the bias is estimated by comparing to the regression-forest-based 'true' ATE. It is a hybrid of the previous two methods.
+- *Gn*: this generates data using a random forest to predict the outcome and randomly bootstrapping the covariates (and their associated predicted $y$s) and also separately bootstrapping their errors. The bias is estimated by comparing to the regression-forest-based 'true' ATE.
+- *Null*: this is the so-called tree-based method we've been using, where we remove the true treatment effect and then bootstrap, and compare to a null ATE.
+- *Hybrid_gn*: this uses the typical bootstrap, but the bias is estimated by comparing to the true ATE. It is a hybrid of the previous two methods.
 
-# Both models correct
-
-### MSE comparison
+# Leacy and Stuart
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 8}
 library(tidyverse)
@@ -26,27 +24,28 @@ library(glue)
 library(knitr)
 
 theta1 <- read_csv(here(
-  'results/comparison_sim_thetas_ld_1.csv'
+  'results/comparison_sim_thetas_ls.csv'
 )) %>%
-  mutate(n = rep(c(500, 2000, 8000), each = 500*8),
-         j = 1,
-         d = 'ld')
+  mutate(j_d = case_when(j == 1 ~ 'Both correct',
+                         j == 2 ~ 'PS model correct',
+                         j == 3 ~ 'Outcome model correct',
+                         j == 4 ~ 'Both models wrong'))
 mse_res <- theta1 %>%
-        group_by(j, n, d, type) %>%
-        summarise(mse = mean((ate - 2)^2),
-                  bias = mean(ate - 2),
+        group_by(j_d, n, d, type) %>%
+        summarise(mse = mean((ate + 0.4)^2),
+                  bias = mean(ate + 0.4),
                   var = var(ate))
       
       ggplot(mse_res, aes(x = type, y = mse)) +
         geom_col() +
-        facet_wrap(n ~ j, scales = 'free_x') +
+        facet_wrap(n ~ j_d, scales = 'free_x') +
         theme_bw() +
         coord_flip() +
         ggtitle('MSE')
       
       ggplot(mse_res, aes(x = type, y = bias)) +
         geom_col() +
-        facet_wrap(n ~ j, scales = 'free_x') +
+        facet_wrap(n ~ j_d, scales = 'free_x') +
         theme_bw() +
         coord_flip() +
         ggtitle('Bias')
@@ -59,88 +58,27 @@ kable(mse_res %>% arrange(n, mse))
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
 b1 <- read_csv(here(
-    'results/comparison_sim_bs_ld_1.csv'
+    'results/comparison_sim_bs_ls.csv'
 )) %>%
-  mutate(n = rep(c(500, 2000, 8000), each = 500*8*4),
-         j = 1,
-         d = 'ld')
+  mutate(j_d = case_when(j == 1 ~ 'Both correct',
+                         j == 2 ~ 'PS model correct',
+                         j == 3 ~ 'Outcome model correct',
+                         j == 4 ~ 'Both models wrong'))
 b_sum <- b1 %>%
-        group_by(j, n, d, est, type) %>%
+        group_by(j_d, n, d, est, type) %>%
         summarise(bhat = mean(b),
-                  bvar = var(b))
+                  bvar = var(b),
+                  b_se = sd(b))
       print(ggplot(b_sum, aes(x = est, y = bhat, group = type, fill = type)) +
         geom_col(position = 'dodge') +
-        facet_wrap(n ~ j))
+        facet_grid(n ~ j_d))
       
-      print(ggplot(b_sum, aes(x = n, y = bvar, group = est, fill = est)) +
+      print(ggplot(b_sum, aes(x = n, y = b_se, group = est, fill = est)) +
         geom_col(position = 'dodge') +
-        facet_wrap(type ~ j) +
+        facet_grid(type ~ j_d) +
           scale_y_sqrt())
-
-kable(b_sum %>% arrange(n, type, est))
-```
-
-# Outcome model incorrect
-
-### MSE comparison
-
-```{r echo = FALSE, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 8}
-library(tidyverse)
-library(here)
-library(glue)
-library(knitr)
-
-theta1 <- read_csv(here(
-  'results/comparison_sim_thetas_ld_2.csv'
-)) %>%
-  mutate(n = rep(c(500, 2000, 8000), each = 500*8),
-         j = 2,
-         d = 'ld')
-mse_res <- theta1 %>%
-        group_by(j, n, d, type) %>%
-        summarise(mse = mean((ate - 2)^2),
-                  bias = mean(ate - 2),
-                  var = var(ate))
       
-      ggplot(mse_res, aes(x = type, y = mse)) +
-        geom_col() +
-        facet_wrap(n ~ j, scales = 'free_x') +
-        theme_bw() +
-        coord_flip() +
-        ggtitle('MSE')
-      
-      ggplot(mse_res, aes(x = type, y = bias)) +
-        geom_col() +
-        facet_wrap(n ~ j, scales = 'free_x') +
-        theme_bw() +
-        coord_flip() +
-        ggtitle('Bias')
 
-kable(mse_res %>% arrange(n, mse))
 
-```
-
-### Comparing the coefficients
-
-```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
-b1 <- read_csv(here(
-    'results/comparison_sim_bs_ld_2.csv'
-)) %>%
-  mutate(n = rep(c(500, 2000, 8000), each = 500*8*4),
-         j = 2,
-         d = 'ld')
-b_sum <- b1 %>%
-        group_by(j, n, d, est, type) %>%
-        summarise(bhat = mean(b),
-                  bvar = var(b))
-      print(ggplot(b_sum, aes(x = est, y = bhat, group = type, fill = type)) +
-        geom_col(position = 'dodge') +
-        facet_wrap(n ~ j))
-      
-      print(ggplot(b_sum, aes(x = n, y = bvar, group = est, fill = est)) +
-        geom_col(position = 'dodge') +
-        facet_wrap(type ~ j)+
-          scale_y_sqrt())
-
-kable(b_sum %>% arrange(n, type, est))
+kable(b_sum %>% arrange( j_d, type, est, n))
 ```

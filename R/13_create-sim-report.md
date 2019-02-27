@@ -8,280 +8,501 @@ In these simulations, I consider eight different types of possible ways of creat
 -   *Shrunk*: this uses the raw differences but scales them by *n*: $\\hat{\\Delta} = n^{-1}(\\hat{\\theta}\_i - \\hat{\\theta}\_0)$.
 -   *Boot*: this replaces $\\hat{\\theta}\_i$ with the mean of its bootstrapped versions $\\bar{\\theta}^\*\_i$
 -   *All\_boot*: this replaces both quantities with their bootstrapped versions: $\\hat{\\Delta} = \\bar{\\theta}^\*\_i - \\bar{\\theta}^\*\_0$
--   *Gn*: this generates data using a regression forest to predict the outcome and randomly bootstrapping the covariates (and their associated predicted *y*s) and also separately bootstrapping their errors. The bias is estimated by comparing to the regression-forest-based 'true' ATE.
--   *Null*: this is the so-called tree-based method we've been using, where we remove the treatment effect and then bootstrap, and compare to a null ATE.
--   *Hybrid\_gn*: this uses the typical bootstrap, but the bias is estimated by comparing to the regression-forest-based 'true' ATE. It is a hybrid of the previous two methods.
+-   *Gn*: this generates data using a random forest to predict the outcome and randomly bootstrapping the covariates (and their associated predicted *y*s) and also separately bootstrapping their errors. The bias is estimated by comparing to the regression-forest-based 'true' ATE.
+-   *Null*: this is the so-called tree-based method we've been using, where we remove the true treatment effect and then bootstrap, and compare to a null ATE.
+-   *Hybrid\_gn*: this uses the typical bootstrap, but the bias is estimated by comparing to the true ATE. It is a hybrid of the previous two methods.
 
-Both models correct
-===================
-
-### MSE comparison
+Leacy and Stuart
+================
 
 ![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-1-1.png)![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-1-2.png)
 
-|    j|     n| d   | type       |        mse|        bias|        var|
-|----:|-----:|:----|:-----------|----------:|-----------:|----------:|
-|    1|   500| ld  | none       |  0.0140225|  -0.0218676|  0.0135714|
-|    1|   500| ld  | shrunk     |  0.0140225|  -0.0218675|  0.0135714|
-|    1|   500| ld  | all\_boot  |  0.0172590|  -0.0192945|  0.0169206|
-|    1|   500| ld  | boot       |  0.0173807|  -0.0198110|  0.0170222|
-|    1|   500| ld  | old        |  0.0174160|  -0.0200358|  0.0170487|
-|    1|   500| ld  | hybrid\_gn |  0.0333398|  -0.1119960|  0.0208384|
-|    1|   500| ld  | null       |  0.0334625|  -0.1119640|  0.0209685|
-|    1|   500| ld  | gn         |  0.2106878|   0.1895435|  0.1751113|
-|    1|  2000| ld  | shrunk     |  0.0041998|  -0.0095173|  0.0041175|
-|    1|  2000| ld  | none       |  0.0041998|  -0.0095173|  0.0041175|
-|    1|  2000| ld  | old        |  0.0049964|  -0.0062773|  0.0049669|
-|    1|  2000| ld  | all\_boot  |  0.0050066|  -0.0061865|  0.0049783|
-|    1|  2000| ld  | boot       |  0.0050368|  -0.0061446|  0.0050091|
-|    1|  2000| ld  | hybrid\_gn |  0.0121036|  -0.0630403|  0.0081458|
-|    1|  2000| ld  | null       |  0.0122747|  -0.0634436|  0.0082662|
-|    1|  2000| ld  | gn         |  0.0591538|   0.1121264|  0.0466748|
-|    1|  8000| ld  | all\_boot  |  0.0011012|  -0.0018869|  0.0010999|
-|    1|  8000| ld  | old        |  0.0011035|  -0.0019369|  0.0011020|
-|    1|  8000| ld  | boot       |  0.0011057|  -0.0019679|  0.0011041|
-|    1|  8000| ld  | shrunk     |  0.0011213|  -0.0082815|  0.0010548|
-|    1|  8000| ld  | none       |  0.0011213|  -0.0082816|  0.0010548|
-|    1|  8000| ld  | hybrid\_gn |  0.0051844|  -0.0408313|  0.0035243|
-|    1|  8000| ld  | null       |  0.0052229|  -0.0429547|  0.0033846|
-|    1|  8000| ld  | gn         |  0.0114459|   0.0465886|  0.0092940|
+| j\_d                  |     n| d   | type       |        mse|        bias|        var|
+|:----------------------|-----:|:----|:-----------|----------:|-----------:|----------:|
+| Outcome model correct |   500| ls  | null       |  0.0000653|   0.0036804|  0.0000519|
+| Outcome model correct |   500| ls  | hybrid\_gn |  0.0000653|   0.0036804|  0.0000519|
+| Both correct          |   500| ls  | null       |  0.0000743|   0.0026890|  0.0000672|
+| Both correct          |   500| ls  | hybrid\_gn |  0.0000743|   0.0026890|  0.0000672|
+| Both correct          |   500| ls  | shrunk     |  0.0001513|   0.0011188|  0.0001503|
+| Both correct          |   500| ls  | none       |  0.0001513|   0.0011188|  0.0001503|
+| Outcome model correct |   500| ls  | shrunk     |  0.0001625|   0.0020170|  0.0001588|
+| Outcome model correct |   500| ls  | none       |  0.0001625|   0.0020170|  0.0001588|
+| Outcome model correct |   500| ls  | all\_boot  |  0.0002228|   0.0016367|  0.0002206|
+| Outcome model correct |   500| ls  | boot       |  0.0002236|   0.0016772|  0.0002213|
+| Outcome model correct |   500| ls  | old        |  0.0002244|   0.0016861|  0.0002220|
+| Outcome model correct |   500| ls  | gn         |  0.0002276|  -0.0023049|  0.0002227|
+| Both correct          |   500| ls  | boot       |  0.0003370|   0.0030215|  0.0003285|
+| Both correct          |   500| ls  | old        |  0.0003409|   0.0030369|  0.0003324|
+| Both correct          |   500| ls  | gn         |  0.0008138|  -0.0097653|  0.0007199|
+| Both correct          |   500| ls  | all\_boot  |  0.0029911|   0.0019971|  0.0029931|
+| PS model correct      |   500| ls  | gn         |  0.0171927|   0.0915372|  0.0088313|
+| PS model correct      |   500| ls  | hybrid\_gn |  0.0196327|   0.1230220|  0.0045073|
+| PS model correct      |   500| ls  | null       |  0.0196327|   0.1230220|  0.0045073|
+| Both models wrong     |   500| ls  | gn         |  0.0445456|   0.1916434|  0.0078341|
+| Both models wrong     |   500| ls  | hybrid\_gn |  0.0449076|   0.1954023|  0.0067390|
+| Both models wrong     |   500| ls  | null       |  0.0449076|   0.1954023|  0.0067390|
+| PS model correct      |   500| ls  | shrunk     |  0.0497142|   0.2083502|  0.0063170|
+| PS model correct      |   500| ls  | none       |  0.0497148|   0.2083516|  0.0063171|
+| Both models wrong     |   500| ls  | old        |  0.0579467|   0.2236176|  0.0079578|
+| Both models wrong     |   500| ls  | all\_boot  |  0.0579743|   0.2235891|  0.0079982|
+| Both models wrong     |   500| ls  | boot       |  0.0580506|   0.2239310|  0.0079213|
+| Both models wrong     |   500| ls  | shrunk     |  0.0621722|   0.2352426|  0.0068468|
+| Both models wrong     |   500| ls  | none       |  0.0621723|   0.2352428|  0.0068468|
+| PS model correct      |   500| ls  | old        |  0.0662474|   0.1032067|  0.0557072|
+| PS model correct      |   500| ls  | boot       |  0.0750432|   0.1036691|  0.0644248|
+| PS model correct      |   500| ls  | all\_boot  |  0.1018085|   0.0816973|  0.0953247|
+| Both correct          |  2000| ls  | null       |  0.0000124|   0.0016735|  0.0000096|
+| Both correct          |  2000| ls  | hybrid\_gn |  0.0000124|   0.0016735|  0.0000096|
+| Outcome model correct |  2000| ls  | hybrid\_gn |  0.0000141|   0.0019885|  0.0000102|
+| Outcome model correct |  2000| ls  | null       |  0.0000141|   0.0019885|  0.0000102|
+| Both correct          |  2000| ls  | shrunk     |  0.0000363|   0.0008352|  0.0000357|
+| Both correct          |  2000| ls  | none       |  0.0000363|   0.0008352|  0.0000357|
+| Outcome model correct |  2000| ls  | shrunk     |  0.0000436|   0.0017279|  0.0000407|
+| Outcome model correct |  2000| ls  | none       |  0.0000436|   0.0017279|  0.0000407|
+| Outcome model correct |  2000| ls  | gn         |  0.0000513|  -0.0008371|  0.0000507|
+| Outcome model correct |  2000| ls  | all\_boot  |  0.0000552|   0.0009150|  0.0000545|
+| Outcome model correct |  2000| ls  | old        |  0.0000552|   0.0009092|  0.0000545|
+| Outcome model correct |  2000| ls  | boot       |  0.0000554|   0.0009265|  0.0000547|
+| Both correct          |  2000| ls  | old        |  0.0002763|   0.0019782|  0.0002729|
+| Both correct          |  2000| ls  | all\_boot  |  0.0003090|   0.0019989|  0.0003056|
+| Both correct          |  2000| ls  | boot       |  0.0003205|   0.0019968|  0.0003172|
+| Both correct          |  2000| ls  | gn         |  0.0008300|  -0.0116959|  0.0006946|
+| PS model correct      |  2000| ls  | hybrid\_gn |  0.0060374|   0.0640059|  0.0019445|
+| PS model correct      |  2000| ls  | null       |  0.0060374|   0.0640059|  0.0019445|
+| PS model correct      |  2000| ls  | gn         |  0.0067104|   0.0298332|  0.0058320|
+| PS model correct      |  2000| ls  | shrunk     |  0.0378479|   0.1890340|  0.0021183|
+| PS model correct      |  2000| ls  | none       |  0.0378480|   0.1890343|  0.0021183|
+| Both models wrong     |  2000| ls  | hybrid\_gn |  0.0437094|   0.2035844|  0.0022674|
+| Both models wrong     |  2000| ls  | null       |  0.0437094|   0.2035844|  0.0022674|
+| Both models wrong     |  2000| ls  | gn         |  0.0437300|   0.2032009|  0.0024443|
+| Both models wrong     |  2000| ls  | old        |  0.0497730|   0.2177915|  0.0023446|
+| Both models wrong     |  2000| ls  | all\_boot  |  0.0498195|   0.2179068|  0.0023408|
+| Both models wrong     |  2000| ls  | boot       |  0.0498819|   0.2179959|  0.0023644|
+| Both models wrong     |  2000| ls  | shrunk     |  0.0553825|   0.2313199|  0.0018773|
+| Both models wrong     |  2000| ls  | none       |  0.0553825|   0.2313200|  0.0018773|
+| PS model correct      |  2000| ls  | old        |  0.0845917|   0.0388941|  0.0832454|
+| PS model correct      |  2000| ls  | all\_boot  |  0.0925426|   0.0368206|  0.0913696|
+| PS model correct      |  2000| ls  | boot       |  0.0979900|   0.0370855|  0.0968083|
+| Both correct          |  8000| ls  | hybrid\_gn |  0.0000023|   0.0007212|  0.0000018|
+| Both correct          |  8000| ls  | null       |  0.0000023|   0.0007212|  0.0000018|
+| Outcome model correct |  8000| ls  | null       |  0.0000030|   0.0008461|  0.0000023|
+| Outcome model correct |  8000| ls  | hybrid\_gn |  0.0000030|   0.0008461|  0.0000023|
+| Both correct          |  8000| ls  | shrunk     |  0.0000087|   0.0004659|  0.0000085|
+| Both correct          |  8000| ls  | none       |  0.0000087|   0.0004659|  0.0000085|
+| Outcome model correct |  8000| ls  | gn         |  0.0000097|  -0.0006081|  0.0000094|
+| Outcome model correct |  8000| ls  | boot       |  0.0000103|   0.0003114|  0.0000102|
+| Outcome model correct |  8000| ls  | old        |  0.0000103|   0.0003158|  0.0000102|
+| Outcome model correct |  8000| ls  | all\_boot  |  0.0000104|   0.0003250|  0.0000103|
+| Outcome model correct |  8000| ls  | shrunk     |  0.0000111|   0.0011678|  0.0000098|
+| Outcome model correct |  8000| ls  | none       |  0.0000111|   0.0011678|  0.0000098|
+| Both correct          |  8000| ls  | all\_boot  |  0.0000295|   0.0006746|  0.0000291|
+| Both correct          |  8000| ls  | old        |  0.0000298|   0.0006769|  0.0000294|
+| Both correct          |  8000| ls  | boot       |  0.0000299|   0.0006652|  0.0000295|
+| Both correct          |  8000| ls  | gn         |  0.0004727|  -0.0094920|  0.0003833|
+| PS model correct      |  8000| ls  | hybrid\_gn |  0.0021769|   0.0367033|  0.0008315|
+| PS model correct      |  8000| ls  | null       |  0.0021769|   0.0367033|  0.0008315|
+| PS model correct      |  8000| ls  | gn         |  0.0034339|   0.0105192|  0.0033299|
+| PS model correct      |  8000| ls  | old        |  0.0135604|   0.0167149|  0.0133076|
+| PS model correct      |  8000| ls  | boot       |  0.0156250|   0.0154775|  0.0154163|
+| PS model correct      |  8000| ls  | all\_boot  |  0.0159868|   0.0159151|  0.0157650|
+| PS model correct      |  8000| ls  | shrunk     |  0.0389521|   0.1954827|  0.0007401|
+| PS model correct      |  8000| ls  | none       |  0.0389521|   0.1954827|  0.0007401|
+| Both models wrong     |  8000| ls  | hybrid\_gn |  0.0444914|   0.2094228|  0.0006348|
+| Both models wrong     |  8000| ls  | null       |  0.0444914|   0.2094228|  0.0006348|
+| Both models wrong     |  8000| ls  | gn         |  0.0445081|   0.2094595|  0.0006361|
+| Both models wrong     |  8000| ls  | old        |  0.0471831|   0.2157930|  0.0006177|
+| Both models wrong     |  8000| ls  | boot       |  0.0471906|   0.2158044|  0.0006203|
+| Both models wrong     |  8000| ls  | all\_boot  |  0.0472004|   0.2158380|  0.0006156|
+| Both models wrong     |  8000| ls  | shrunk     |  0.0545116|   0.2323799|  0.0005122|
+| Both models wrong     |  8000| ls  | none       |  0.0545116|   0.2323799|  0.0005122|
 
 ### Comparing the coefficients
 
 ![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-2-1.png)![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-2-2.png)
 
-|    j|     n| d   | est         | type       |       bhat|       bvar|
-|----:|-----:|:----|:------------|:-----------|----------:|----------:|
-|    1|   500| ld  | ate\_dr     | all\_boot  |  0.3073024|  0.0623596|
-|    1|   500| ld  | ate\_ipw\_2 | all\_boot  |  0.0131790|  0.0005283|
-|    1|   500| ld  | ate\_regr   | all\_boot  |  0.6490450|  0.0598435|
-|    1|   500| ld  | ate\_strat  | all\_boot  |  0.0304736|  0.0040716|
-|    1|   500| ld  | ate\_dr     | boot       |  0.3094088|  0.0635003|
-|    1|   500| ld  | ate\_ipw\_2 | boot       |  0.0130124|  0.0005196|
-|    1|   500| ld  | ate\_regr   | boot       |  0.6456200|  0.0608899|
-|    1|   500| ld  | ate\_strat  | boot       |  0.0319588|  0.0041948|
-|    1|   500| ld  | ate\_dr     | gn         |  0.5493046|  0.2390297|
-|    1|   500| ld  | ate\_ipw\_2 | gn         |  0.3228894|  0.2053319|
-|    1|   500| ld  | ate\_regr   | gn         |  0.1278060|  0.1008927|
-|    1|   500| ld  | ate\_strat  | gn         |  0.0000000|  0.0000000|
-|    1|   500| ld  | ate\_dr     | hybrid\_gn |  0.1526213|  0.0469661|
-|    1|   500| ld  | ate\_ipw\_2 | hybrid\_gn |  0.0171219|  0.0011910|
-|    1|   500| ld  | ate\_regr   | hybrid\_gn |  0.6593791|  0.0582243|
-|    1|   500| ld  | ate\_strat  | hybrid\_gn |  0.1708777|  0.0196919|
-|    1|   500| ld  | ate\_dr     | none       |  0.1871372|  0.0432350|
-|    1|   500| ld  | ate\_ipw\_2 | none       |  0.0155747|  0.0006579|
-|    1|   500| ld  | ate\_regr   | none       |  0.7799041|  0.0450245|
-|    1|   500| ld  | ate\_strat  | none       |  0.0173840|  0.0007337|
-|    1|   500| ld  | ate\_dr     | null       |  0.1524525|  0.0447427|
-|    1|   500| ld  | ate\_ipw\_2 | null       |  0.0168124|  0.0011710|
-|    1|   500| ld  | ate\_regr   | null       |  0.6584694|  0.0556875|
-|    1|   500| ld  | ate\_strat  | null       |  0.1722657|  0.0202359|
-|    1|   500| ld  | ate\_dr     | old        |  0.3080084|  0.0621548|
-|    1|   500| ld  | ate\_ipw\_2 | old        |  0.0136052|  0.0005475|
-|    1|   500| ld  | ate\_regr   | old        |  0.6466837|  0.0596629|
-|    1|   500| ld  | ate\_strat  | old        |  0.0317027|  0.0042311|
-|    1|   500| ld  | ate\_dr     | shrunk     |  0.1871385|  0.0432350|
-|    1|   500| ld  | ate\_ipw\_2 | shrunk     |  0.0155745|  0.0006578|
-|    1|   500| ld  | ate\_regr   | shrunk     |  0.7799030|  0.0450245|
-|    1|   500| ld  | ate\_strat  | shrunk     |  0.0173839|  0.0007337|
-|    1|  2000| ld  | ate\_dr     | all\_boot  |  0.2382960|  0.0613506|
-|    1|  2000| ld  | ate\_ipw\_2 | all\_boot  |  0.0076921|  0.0001889|
-|    1|  2000| ld  | ate\_regr   | all\_boot  |  0.7304391|  0.0552811|
-|    1|  2000| ld  | ate\_strat  | all\_boot  |  0.0235728|  0.0013834|
-|    1|  2000| ld  | ate\_dr     | boot       |  0.2396148|  0.0625888|
-|    1|  2000| ld  | ate\_ipw\_2 | boot       |  0.0076715|  0.0001896|
-|    1|  2000| ld  | ate\_regr   | boot       |  0.7291392|  0.0565684|
-|    1|  2000| ld  | ate\_strat  | boot       |  0.0235744|  0.0013480|
-|    1|  2000| ld  | ate\_dr     | gn         |  0.3300018|  0.2155923|
-|    1|  2000| ld  | ate\_ipw\_2 | gn         |  0.3847353|  0.2308802|
-|    1|  2000| ld  | ate\_regr   | gn         |  0.2852629|  0.1984797|
-|    1|  2000| ld  | ate\_strat  | gn         |  0.0000000|  0.0000000|
-|    1|  2000| ld  | ate\_dr     | hybrid\_gn |  0.1044715|  0.0426871|
-|    1|  2000| ld  | ate\_ipw\_2 | hybrid\_gn |  0.0077199|  0.0005833|
-|    1|  2000| ld  | ate\_regr   | hybrid\_gn |  0.7622487|  0.0438398|
-|    1|  2000| ld  | ate\_strat  | hybrid\_gn |  0.1255599|  0.0154121|
-|    1|  2000| ld  | ate\_dr     | none       |  0.0938665|  0.0148842|
-|    1|  2000| ld  | ate\_ipw\_2 | none       |  0.0071586|  0.0001749|
-|    1|  2000| ld  | ate\_regr   | none       |  0.8837611|  0.0155516|
-|    1|  2000| ld  | ate\_strat  | none       |  0.0152138|  0.0006140|
-|    1|  2000| ld  | ate\_dr     | null       |  0.1116898|  0.0438501|
-|    1|  2000| ld  | ate\_ipw\_2 | null       |  0.0074585|  0.0005355|
-|    1|  2000| ld  | ate\_regr   | null       |  0.7548641|  0.0447121|
-|    1|  2000| ld  | ate\_strat  | null       |  0.1259875|  0.0159014|
-|    1|  2000| ld  | ate\_dr     | old        |  0.2372438|  0.0614541|
-|    1|  2000| ld  | ate\_ipw\_2 | old        |  0.0077478|  0.0001867|
-|    1|  2000| ld  | ate\_regr   | old        |  0.7312977|  0.0554547|
-|    1|  2000| ld  | ate\_strat  | old        |  0.0237107|  0.0014048|
-|    1|  2000| ld  | ate\_dr     | shrunk     |  0.0938666|  0.0148842|
-|    1|  2000| ld  | ate\_ipw\_2 | shrunk     |  0.0071586|  0.0001749|
-|    1|  2000| ld  | ate\_regr   | shrunk     |  0.8837611|  0.0155516|
-|    1|  2000| ld  | ate\_strat  | shrunk     |  0.0152137|  0.0006140|
-|    1|  8000| ld  | ate\_dr     | all\_boot  |  0.1980371|  0.0596797|
-|    1|  8000| ld  | ate\_ipw\_2 | all\_boot  |  0.0073242|  0.0001481|
-|    1|  8000| ld  | ate\_regr   | all\_boot  |  0.7808907|  0.0561308|
-|    1|  8000| ld  | ate\_strat  | all\_boot  |  0.0137481|  0.0004194|
-|    1|  8000| ld  | ate\_dr     | boot       |  0.1977389|  0.0605912|
-|    1|  8000| ld  | ate\_ipw\_2 | boot       |  0.0073013|  0.0001502|
-|    1|  8000| ld  | ate\_regr   | boot       |  0.7810851|  0.0570949|
-|    1|  8000| ld  | ate\_strat  | boot       |  0.0138748|  0.0004319|
-|    1|  8000| ld  | ate\_dr     | gn         |  0.1819941|  0.1470528|
-|    1|  8000| ld  | ate\_ipw\_2 | gn         |  0.3121772|  0.2104689|
-|    1|  8000| ld  | ate\_regr   | gn         |  0.5058288|  0.2445238|
-|    1|  8000| ld  | ate\_strat  | gn         |  0.0000000|  0.0000000|
-|    1|  8000| ld  | ate\_dr     | hybrid\_gn |  0.1153185|  0.0605110|
-|    1|  8000| ld  | ate\_ipw\_2 | hybrid\_gn |  0.0115814|  0.0016387|
-|    1|  8000| ld  | ate\_regr   | hybrid\_gn |  0.7870325|  0.0571749|
-|    1|  8000| ld  | ate\_strat  | hybrid\_gn |  0.0860675|  0.0094867|
-|    1|  8000| ld  | ate\_dr     | none       |  0.0539000|  0.0061686|
-|    1|  8000| ld  | ate\_ipw\_2 | none       |  0.0048674|  0.0000814|
-|    1|  8000| ld  | ate\_regr   | none       |  0.9234565|  0.0067880|
-|    1|  8000| ld  | ate\_strat  | none       |  0.0177761|  0.0007124|
-|    1|  8000| ld  | ate\_dr     | null       |  0.1255390|  0.0639318|
-|    1|  8000| ld  | ate\_ipw\_2 | null       |  0.0116646|  0.0018116|
-|    1|  8000| ld  | ate\_regr   | null       |  0.7741161|  0.0594737|
-|    1|  8000| ld  | ate\_strat  | null       |  0.0886803|  0.0094368|
-|    1|  8000| ld  | ate\_dr     | old        |  0.1984076|  0.0597661|
-|    1|  8000| ld  | ate\_ipw\_2 | old        |  0.0073536|  0.0001493|
-|    1|  8000| ld  | ate\_regr   | old        |  0.7803737|  0.0561794|
-|    1|  8000| ld  | ate\_strat  | old        |  0.0138651|  0.0004299|
-|    1|  8000| ld  | ate\_dr     | shrunk     |  0.0539000|  0.0061686|
-|    1|  8000| ld  | ate\_ipw\_2 | shrunk     |  0.0048674|  0.0000814|
-|    1|  8000| ld  | ate\_regr   | shrunk     |  0.9234565|  0.0067880|
-|    1|  8000| ld  | ate\_strat  | shrunk     |  0.0177761|  0.0007124|
-
-Outcome model incorrect
-=======================
-
-### MSE comparison
-
-![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-3-1.png)![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-3-2.png)
-
-|    j|     n| d   | type       |        mse|        bias|        var|
-|----:|-----:|:----|:-----------|----------:|-----------:|----------:|
-|    2|   500| ld  | all\_boot  |  0.0347880|  -0.0470981|  0.0326350|
-|    2|   500| ld  | boot       |  0.0350798|  -0.0487708|  0.0327667|
-|    2|   500| ld  | old        |  0.0351406|  -0.0476908|  0.0329320|
-|    2|   500| ld  | hybrid\_gn |  0.0483227|  -0.1649690|  0.0211502|
-|    2|   500| ld  | null       |  0.0488341|  -0.1661164|  0.0212820|
-|    2|   500| ld  | shrunk     |  0.1056993|  -0.2792709|  0.0277626|
-|    2|   500| ld  | none       |  0.1057060|  -0.2792807|  0.0277638|
-|    2|   500| ld  | gn         |  0.2284170|   0.1657133|  0.2013588|
-|    2|  2000| ld  | old        |  0.0090267|  -0.0075819|  0.0089872|
-|    2|  2000| ld  | all\_boot  |  0.0090393|  -0.0074268|  0.0090021|
-|    2|  2000| ld  | boot       |  0.0091335|  -0.0077224|  0.0090921|
-|    2|  2000| ld  | hybrid\_gn |  0.0151859|  -0.0828862|  0.0083325|
-|    2|  2000| ld  | null       |  0.0154836|  -0.0840615|  0.0084341|
-|    2|  2000| ld  | gn         |  0.0644215|   0.1069710|  0.0530848|
-|    2|  2000| ld  | shrunk     |  0.0792397|  -0.2596417|  0.0118496|
-|    2|  2000| ld  | none       |  0.0792411|  -0.2596441|  0.0118498|
-|    2|  8000| ld  | all\_boot  |  0.0021570|  -0.0021775|  0.0021566|
-|    2|  8000| ld  | old        |  0.0021591|  -0.0021918|  0.0021586|
-|    2|  8000| ld  | boot       |  0.0021686|  -0.0025406|  0.0021665|
-|    2|  8000| ld  | hybrid\_gn |  0.0057879|  -0.0485993|  0.0034329|
-|    2|  8000| ld  | null       |  0.0059232|  -0.0499665|  0.0034334|
-|    2|  8000| ld  | gn         |  0.0129821|   0.0475593|  0.0107417|
-|    2|  8000| ld  | shrunk     |  0.0784149|  -0.2713150|  0.0048127|
-|    2|  8000| ld  | none       |  0.0784152|  -0.2713157|  0.0048127|
-
-### Comparing the coefficients
-
-![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-4-1.png)![](13_create-sim-report_files/figure-markdown_github/unnamed-chunk-4-2.png)
-
-|    j|     n| d   | est         | type       |       bhat|       bvar|
-|----:|-----:|:----|:------------|:-----------|----------:|----------:|
-|    2|   500| ld  | ate\_dr     | all\_boot  |  0.8773410|  0.0149653|
-|    2|   500| ld  | ate\_ipw\_2 | all\_boot  |  0.0150666|  0.0015438|
-|    2|   500| ld  | ate\_regr   | all\_boot  |  0.1035260|  0.0099696|
-|    2|   500| ld  | ate\_strat  | all\_boot  |  0.0040664|  0.0004457|
-|    2|   500| ld  | ate\_dr     | boot       |  0.8740461|  0.0153988|
-|    2|   500| ld  | ate\_ipw\_2 | boot       |  0.0149929|  0.0015071|
-|    2|   500| ld  | ate\_regr   | boot       |  0.1069261|  0.0104343|
-|    2|   500| ld  | ate\_strat  | boot       |  0.0040348|  0.0004284|
-|    2|   500| ld  | ate\_dr     | gn         |  0.6548356|  0.2148472|
-|    2|   500| ld  | ate\_ipw\_2 | gn         |  0.3451644|  0.2148472|
-|    2|   500| ld  | ate\_regr   | gn         |  0.0000000|  0.0000000|
-|    2|   500| ld  | ate\_strat  | gn         |  0.0000000|  0.0000000|
-|    2|   500| ld  | ate\_dr     | hybrid\_gn |  0.6821530|  0.0468527|
-|    2|   500| ld  | ate\_ipw\_2 | hybrid\_gn |  0.0140388|  0.0012824|
-|    2|   500| ld  | ate\_regr   | hybrid\_gn |  0.2715863|  0.0369305|
-|    2|   500| ld  | ate\_strat  | hybrid\_gn |  0.0322219|  0.0041702|
-|    2|   500| ld  | ate\_dr     | none       |  0.4838636|  0.0451130|
-|    2|   500| ld  | ate\_ipw\_2 | none       |  0.0107654|  0.0007751|
-|    2|   500| ld  | ate\_regr   | none       |  0.4356653|  0.0365312|
-|    2|   500| ld  | ate\_strat  | none       |  0.0697056|  0.0051342|
-|    2|   500| ld  | ate\_dr     | null       |  0.6804156|  0.0472119|
-|    2|   500| ld  | ate\_ipw\_2 | null       |  0.0135263|  0.0011892|
-|    2|   500| ld  | ate\_regr   | null       |  0.2722707|  0.0367273|
-|    2|   500| ld  | ate\_strat  | null       |  0.0337873|  0.0044775|
-|    2|   500| ld  | ate\_dr     | old        |  0.8708853|  0.0177662|
-|    2|   500| ld  | ate\_ipw\_2 | old        |  0.0163894|  0.0016922|
-|    2|   500| ld  | ate\_regr   | old        |  0.1036556|  0.0102004|
-|    2|   500| ld  | ate\_strat  | old        |  0.0090697|  0.0025512|
-|    2|   500| ld  | ate\_dr     | shrunk     |  0.4838791|  0.0451113|
-|    2|   500| ld  | ate\_ipw\_2 | shrunk     |  0.0107655|  0.0007751|
-|    2|   500| ld  | ate\_regr   | shrunk     |  0.4356564|  0.0365304|
-|    2|   500| ld  | ate\_strat  | shrunk     |  0.0696989|  0.0051337|
-|    2|  2000| ld  | ate\_dr     | all\_boot  |  0.9694612|  0.0011641|
-|    2|  2000| ld  | ate\_ipw\_2 | all\_boot  |  0.0058532|  0.0004485|
-|    2|  2000| ld  | ate\_regr   | all\_boot  |  0.0238794|  0.0003551|
-|    2|  2000| ld  | ate\_strat  | all\_boot  |  0.0008062|  0.0001250|
-|    2|  2000| ld  | ate\_dr     | boot       |  0.9690923|  0.0013771|
-|    2|  2000| ld  | ate\_ipw\_2 | boot       |  0.0058805|  0.0004464|
-|    2|  2000| ld  | ate\_regr   | boot       |  0.0242188|  0.0005783|
-|    2|  2000| ld  | ate\_strat  | boot       |  0.0008085|  0.0001213|
-|    2|  2000| ld  | ate\_dr     | gn         |  0.5631526|  0.2427950|
-|    2|  2000| ld  | ate\_ipw\_2 | gn         |  0.4368474|  0.2427950|
-|    2|  2000| ld  | ate\_regr   | gn         |  0.0000000|  0.0000000|
-|    2|  2000| ld  | ate\_strat  | gn         |  0.0000000|  0.0000000|
-|    2|  2000| ld  | ate\_dr     | hybrid\_gn |  0.8208599|  0.0246966|
-|    2|  2000| ld  | ate\_ipw\_2 | hybrid\_gn |  0.0082484|  0.0009468|
-|    2|  2000| ld  | ate\_regr   | hybrid\_gn |  0.1628244|  0.0218468|
-|    2|  2000| ld  | ate\_strat  | hybrid\_gn |  0.0080672|  0.0018136|
-|    2|  2000| ld  | ate\_dr     | none       |  0.4748265|  0.0306402|
-|    2|  2000| ld  | ate\_ipw\_2 | none       |  0.0022731|  0.0001375|
-|    2|  2000| ld  | ate\_regr   | none       |  0.4424569|  0.0184903|
-|    2|  2000| ld  | ate\_strat  | none       |  0.0804434|  0.0057878|
-|    2|  2000| ld  | ate\_dr     | null       |  0.8190093|  0.0252234|
-|    2|  2000| ld  | ate\_ipw\_2 | null       |  0.0077410|  0.0008517|
-|    2|  2000| ld  | ate\_regr   | null       |  0.1645968|  0.0220434|
-|    2|  2000| ld  | ate\_strat  | null       |  0.0086528|  0.0018865|
-|    2|  2000| ld  | ate\_dr     | old        |  0.9689264|  0.0012361|
-|    2|  2000| ld  | ate\_ipw\_2 | old        |  0.0060248|  0.0004524|
-|    2|  2000| ld  | ate\_regr   | old        |  0.0239147|  0.0003763|
-|    2|  2000| ld  | ate\_strat  | old        |  0.0011340|  0.0001622|
-|    2|  2000| ld  | ate\_dr     | shrunk     |  0.4748311|  0.0306399|
-|    2|  2000| ld  | ate\_ipw\_2 | shrunk     |  0.0022732|  0.0001375|
-|    2|  2000| ld  | ate\_regr   | shrunk     |  0.4424546|  0.0184903|
-|    2|  2000| ld  | ate\_strat  | shrunk     |  0.0804412|  0.0057876|
-|    2|  8000| ld  | ate\_dr     | all\_boot  |  0.9923852|  0.0002637|
-|    2|  8000| ld  | ate\_ipw\_2 | all\_boot  |  0.0012642|  0.0001070|
-|    2|  8000| ld  | ate\_regr   | all\_boot  |  0.0063506|  0.0000481|
-|    2|  8000| ld  | ate\_strat  | all\_boot  |  0.0000000|  0.0000000|
-|    2|  8000| ld  | ate\_dr     | boot       |  0.9915673|  0.0003141|
-|    2|  8000| ld  | ate\_ipw\_2 | boot       |  0.0012844|  0.0001054|
-|    2|  8000| ld  | ate\_regr   | boot       |  0.0071482|  0.0000859|
-|    2|  8000| ld  | ate\_strat  | boot       |  0.0000000|  0.0000000|
-|    2|  8000| ld  | ate\_dr     | gn         |  0.5416889|  0.2461844|
-|    2|  8000| ld  | ate\_ipw\_2 | gn         |  0.4583111|  0.2461844|
-|    2|  8000| ld  | ate\_regr   | gn         |  0.0000000|  0.0000000|
-|    2|  8000| ld  | ate\_strat  | gn         |  0.0000000|  0.0000000|
-|    2|  8000| ld  | ate\_dr     | hybrid\_gn |  0.8877369|  0.0131793|
-|    2|  8000| ld  | ate\_ipw\_2 | hybrid\_gn |  0.0096588|  0.0017507|
-|    2|  8000| ld  | ate\_regr   | hybrid\_gn |  0.1020049|  0.0129925|
-|    2|  8000| ld  | ate\_strat  | hybrid\_gn |  0.0005994|  0.0000342|
-|    2|  8000| ld  | ate\_dr     | none       |  0.4414535|  0.0171964|
-|    2|  8000| ld  | ate\_ipw\_2 | none       |  0.0003758|  0.0000158|
-|    2|  8000| ld  | ate\_regr   | none       |  0.4552394|  0.0084049|
-|    2|  8000| ld  | ate\_strat  | none       |  0.1029312|  0.0057864|
-|    2|  8000| ld  | ate\_dr     | null       |  0.8856864|  0.0133611|
-|    2|  8000| ld  | ate\_ipw\_2 | null       |  0.0090705|  0.0016877|
-|    2|  8000| ld  | ate\_regr   | null       |  0.1043032|  0.0130248|
-|    2|  8000| ld  | ate\_strat  | null       |  0.0009399|  0.0000527|
-|    2|  8000| ld  | ate\_dr     | old        |  0.9923344|  0.0002853|
-|    2|  8000| ld  | ate\_ipw\_2 | old        |  0.0012721|  0.0001079|
-|    2|  8000| ld  | ate\_regr   | old        |  0.0063935|  0.0000563|
-|    2|  8000| ld  | ate\_strat  | old        |  0.0000000|  0.0000000|
-|    2|  8000| ld  | ate\_dr     | shrunk     |  0.4414548|  0.0171964|
-|    2|  8000| ld  | ate\_ipw\_2 | shrunk     |  0.0003758|  0.0000158|
-|    2|  8000| ld  | ate\_regr   | shrunk     |  0.4552388|  0.0084049|
-|    2|  8000| ld  | ate\_strat  | shrunk     |  0.1029305|  0.0057864|
+| j\_d                  |     n| d   | est         | type       |       bhat|       bvar|      b\_se|
+|:----------------------|-----:|:----|:------------|:-----------|----------:|----------:|----------:|
+| Both correct          |   500| ls  | ate\_dr     | all\_boot  |  0.1695679|  0.0255845|  0.1599517|
+| Both correct          |  2000| ls  | ate\_dr     | all\_boot  |  0.2444078|  0.0540004|  0.2323799|
+| Both correct          |  8000| ls  | ate\_dr     | all\_boot  |  0.1923664|  0.0558183|  0.2362589|
+| Both correct          |   500| ls  | ate\_ipw\_2 | all\_boot  |  0.0070507|  0.0004883|  0.0220977|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | all\_boot  |  0.0030940|  0.0000991|  0.0099564|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | all\_boot  |  0.0014134|  0.0000135|  0.0036741|
+| Both correct          |   500| ls  | ate\_regr   | all\_boot  |  0.7976071|  0.0266153|  0.1631419|
+| Both correct          |  2000| ls  | ate\_regr   | all\_boot  |  0.7361347|  0.0519427|  0.2279093|
+| Both correct          |  8000| ls  | ate\_regr   | all\_boot  |  0.7979569|  0.0534239|  0.2311360|
+| Both correct          |   500| ls  | ate\_strat  | all\_boot  |  0.0257743|  0.0058952|  0.0767801|
+| Both correct          |  2000| ls  | ate\_strat  | all\_boot  |  0.0163636|  0.0031161|  0.0558222|
+| Both correct          |  8000| ls  | ate\_strat  | all\_boot  |  0.0082634|  0.0002205|  0.0148508|
+| Both correct          |   500| ls  | ate\_dr     | boot       |  0.1567995|  0.0237924|  0.1542479|
+| Both correct          |  2000| ls  | ate\_dr     | boot       |  0.2403182|  0.0523571|  0.2288168|
+| Both correct          |  8000| ls  | ate\_dr     | boot       |  0.1930991|  0.0568108|  0.2383502|
+| Both correct          |   500| ls  | ate\_ipw\_2 | boot       |  0.0050398|  0.0001645|  0.0128238|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | boot       |  0.0031200|  0.0001130|  0.0106295|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | boot       |  0.0013958|  0.0000130|  0.0036094|
+| Both correct          |   500| ls  | ate\_regr   | boot       |  0.8200073|  0.0231806|  0.1522519|
+| Both correct          |  2000| ls  | ate\_regr   | boot       |  0.7403309|  0.0504060|  0.2245128|
+| Both correct          |  8000| ls  | ate\_regr   | boot       |  0.7972446|  0.0544031|  0.2332447|
+| Both correct          |   500| ls  | ate\_strat  | boot       |  0.0181535|  0.0023493|  0.0484696|
+| Both correct          |  2000| ls  | ate\_strat  | boot       |  0.0162309|  0.0030698|  0.0554059|
+| Both correct          |  8000| ls  | ate\_strat  | boot       |  0.0082604|  0.0002251|  0.0150022|
+| Both correct          |   500| ls  | ate\_dr     | gn         |  0.2763965|  0.1371385|  0.3703221|
+| Both correct          |  2000| ls  | ate\_dr     | gn         |  0.3783911|  0.2077705|  0.4558185|
+| Both correct          |  8000| ls  | ate\_dr     | gn         |  0.0410423|  0.0374060|  0.1934063|
+| Both correct          |   500| ls  | ate\_ipw\_2 | gn         |  0.0292696|  0.0051214|  0.0715637|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | gn         |  0.0673423|  0.0199953|  0.1414049|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | gn         |  0.0820707|  0.0269700|  0.1642255|
+| Both correct          |   500| ls  | ate\_regr   | gn         |  0.6932879|  0.1341975|  0.3663298|
+| Both correct          |  2000| ls  | ate\_regr   | gn         |  0.5542666|  0.2019258|  0.4493615|
+| Both correct          |  8000| ls  | ate\_regr   | gn         |  0.8768871|  0.0604959|  0.2459590|
+| Both correct          |   500| ls  | ate\_strat  | gn         |  0.0010460|  0.0002063|  0.0143621|
+| Both correct          |  2000| ls  | ate\_strat  | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Both correct          |  8000| ls  | ate\_strat  | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Both correct          |   500| ls  | ate\_dr     | hybrid\_gn |  0.0804622|  0.0196124|  0.1400444|
+| Both correct          |  2000| ls  | ate\_dr     | hybrid\_gn |  0.1094567|  0.0356789|  0.1888886|
+| Both correct          |  8000| ls  | ate\_dr     | hybrid\_gn |  0.0702983|  0.0197678|  0.1405978|
+| Both correct          |   500| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0032178|  0.0000456|  0.0067533|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0027288|  0.0000341|  0.0058427|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0015373|  0.0000172|  0.0041529|
+| Both correct          |   500| ls  | ate\_regr   | hybrid\_gn |  0.9039263|  0.0193596|  0.1391386|
+| Both correct          |  2000| ls  | ate\_regr   | hybrid\_gn |  0.8785574|  0.0348273|  0.1866207|
+| Both correct          |  8000| ls  | ate\_regr   | hybrid\_gn |  0.9228773|  0.0193969|  0.1392728|
+| Both correct          |   500| ls  | ate\_strat  | hybrid\_gn |  0.0123937|  0.0003893|  0.0197310|
+| Both correct          |  2000| ls  | ate\_strat  | hybrid\_gn |  0.0092571|  0.0002124|  0.0145751|
+| Both correct          |  8000| ls  | ate\_strat  | hybrid\_gn |  0.0052871|  0.0000556|  0.0074571|
+| Both correct          |   500| ls  | ate\_dr     | none       |  0.0625935|  0.0058792|  0.0766757|
+| Both correct          |  2000| ls  | ate\_dr     | none       |  0.0678315|  0.0060364|  0.0776941|
+| Both correct          |  8000| ls  | ate\_dr     | none       |  0.0364767|  0.0023637|  0.0486181|
+| Both correct          |   500| ls  | ate\_ipw\_2 | none       |  0.0022085|  0.0000168|  0.0040951|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | none       |  0.0022938|  0.0000152|  0.0038983|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | none       |  0.0012702|  0.0000049|  0.0022099|
+| Both correct          |   500| ls  | ate\_regr   | none       |  0.9326339|  0.0060201|  0.0775893|
+| Both correct          |  2000| ls  | ate\_regr   | none       |  0.9272898|  0.0060818|  0.0779862|
+| Both correct          |  8000| ls  | ate\_regr   | none       |  0.9596600|  0.0023909|  0.0488969|
+| Both correct          |   500| ls  | ate\_strat  | none       |  0.0025640|  0.0000182|  0.0042684|
+| Both correct          |  2000| ls  | ate\_strat  | none       |  0.0025848|  0.0000173|  0.0041583|
+| Both correct          |  8000| ls  | ate\_strat  | none       |  0.0025930|  0.0000166|  0.0040701|
+| Both correct          |   500| ls  | ate\_dr     | null       |  0.0804622|  0.0196124|  0.1400444|
+| Both correct          |  2000| ls  | ate\_dr     | null       |  0.1094567|  0.0356789|  0.1888886|
+| Both correct          |  8000| ls  | ate\_dr     | null       |  0.0702983|  0.0197678|  0.1405978|
+| Both correct          |   500| ls  | ate\_ipw\_2 | null       |  0.0032178|  0.0000456|  0.0067533|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | null       |  0.0027288|  0.0000341|  0.0058427|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | null       |  0.0015373|  0.0000172|  0.0041529|
+| Both correct          |   500| ls  | ate\_regr   | null       |  0.9039263|  0.0193596|  0.1391386|
+| Both correct          |  2000| ls  | ate\_regr   | null       |  0.8785574|  0.0348273|  0.1866207|
+| Both correct          |  8000| ls  | ate\_regr   | null       |  0.9228773|  0.0193969|  0.1392728|
+| Both correct          |   500| ls  | ate\_strat  | null       |  0.0123937|  0.0003893|  0.0197310|
+| Both correct          |  2000| ls  | ate\_strat  | null       |  0.0092571|  0.0002124|  0.0145751|
+| Both correct          |  8000| ls  | ate\_strat  | null       |  0.0052871|  0.0000556|  0.0074571|
+| Both correct          |   500| ls  | ate\_dr     | old        |  0.1496288|  0.0236796|  0.1538817|
+| Both correct          |  2000| ls  | ate\_dr     | old        |  0.2409891|  0.0530792|  0.2303892|
+| Both correct          |  8000| ls  | ate\_dr     | old        |  0.1911128|  0.0557413|  0.2360959|
+| Both correct          |   500| ls  | ate\_ipw\_2 | old        |  0.0064155|  0.0003472|  0.0186340|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | old        |  0.0032779|  0.0001147|  0.0107115|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | old        |  0.0015548|  0.0000175|  0.0041878|
+| Both correct          |   500| ls  | ate\_regr   | old        |  0.8280573|  0.0224788|  0.1499295|
+| Both correct          |  2000| ls  | ate\_regr   | old        |  0.7398562|  0.0507653|  0.2253115|
+| Both correct          |  8000| ls  | ate\_regr   | old        |  0.7990454|  0.0533499|  0.2309761|
+| Both correct          |   500| ls  | ate\_strat  | old        |  0.0158984|  0.0015790|  0.0397365|
+| Both correct          |  2000| ls  | ate\_strat  | old        |  0.0158769|  0.0026272|  0.0512563|
+| Both correct          |  8000| ls  | ate\_strat  | old        |  0.0082870|  0.0002254|  0.0150124|
+| Both correct          |   500| ls  | ate\_dr     | shrunk     |  0.0625942|  0.0058792|  0.0766760|
+| Both correct          |  2000| ls  | ate\_dr     | shrunk     |  0.0678317|  0.0060364|  0.0776941|
+| Both correct          |  8000| ls  | ate\_dr     | shrunk     |  0.0364767|  0.0023637|  0.0486181|
+| Both correct          |   500| ls  | ate\_ipw\_2 | shrunk     |  0.0022085|  0.0000168|  0.0040951|
+| Both correct          |  2000| ls  | ate\_ipw\_2 | shrunk     |  0.0022938|  0.0000152|  0.0038983|
+| Both correct          |  8000| ls  | ate\_ipw\_2 | shrunk     |  0.0012702|  0.0000049|  0.0022099|
+| Both correct          |   500| ls  | ate\_regr   | shrunk     |  0.9326333|  0.0060201|  0.0775895|
+| Both correct          |  2000| ls  | ate\_regr   | shrunk     |  0.9272897|  0.0060819|  0.0779862|
+| Both correct          |  8000| ls  | ate\_regr   | shrunk     |  0.9596600|  0.0023909|  0.0488969|
+| Both correct          |   500| ls  | ate\_strat  | shrunk     |  0.0025640|  0.0000182|  0.0042684|
+| Both correct          |  2000| ls  | ate\_strat  | shrunk     |  0.0025848|  0.0000173|  0.0041583|
+| Both correct          |  8000| ls  | ate\_strat  | shrunk     |  0.0025930|  0.0000166|  0.0040701|
+| Both models wrong     |   500| ls  | ate\_dr     | all\_boot  |  0.3995140|  0.0600453|  0.2450415|
+| Both models wrong     |  2000| ls  | ate\_dr     | all\_boot  |  0.4363188|  0.0678578|  0.2604953|
+| Both models wrong     |  8000| ls  | ate\_dr     | all\_boot  |  0.4917377|  0.0766473|  0.2768526|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | all\_boot  |  0.0417814|  0.0096461|  0.0982148|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | all\_boot  |  0.0105658|  0.0018217|  0.0426812|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | all\_boot  |  0.0005430|  0.0000376|  0.0061338|
+| Both models wrong     |   500| ls  | ate\_regr   | all\_boot  |  0.4764290|  0.0532952|  0.2308575|
+| Both models wrong     |  2000| ls  | ate\_regr   | all\_boot  |  0.5031789|  0.0490978|  0.2215803|
+| Both models wrong     |  8000| ls  | ate\_regr   | all\_boot  |  0.4891695|  0.0647298|  0.2544205|
+| Both models wrong     |   500| ls  | ate\_strat  | all\_boot  |  0.0822756|  0.0184311|  0.1357613|
+| Both models wrong     |  2000| ls  | ate\_strat  | all\_boot  |  0.0499365|  0.0117674|  0.1084775|
+| Both models wrong     |  8000| ls  | ate\_strat  | all\_boot  |  0.0185498|  0.0022115|  0.0470265|
+| Both models wrong     |   500| ls  | ate\_dr     | boot       |  0.3961491|  0.0599365|  0.2448193|
+| Both models wrong     |  2000| ls  | ate\_dr     | boot       |  0.4354523|  0.0690422|  0.2627588|
+| Both models wrong     |  8000| ls  | ate\_dr     | boot       |  0.4932228|  0.0796603|  0.2822416|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | boot       |  0.0418640|  0.0092498|  0.0961757|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | boot       |  0.0112799|  0.0018303|  0.0427824|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | boot       |  0.0005476|  0.0000384|  0.0061931|
+| Both models wrong     |   500| ls  | ate\_regr   | boot       |  0.4794702|  0.0534820|  0.2312617|
+| Both models wrong     |  2000| ls  | ate\_regr   | boot       |  0.5018324|  0.0506377|  0.2250282|
+| Both models wrong     |  8000| ls  | ate\_regr   | boot       |  0.4874138|  0.0675645|  0.2599316|
+| Both models wrong     |   500| ls  | ate\_strat  | boot       |  0.0825167|  0.0179966|  0.1341512|
+| Both models wrong     |  2000| ls  | ate\_strat  | boot       |  0.0514354|  0.0122516|  0.1106872|
+| Both models wrong     |  8000| ls  | ate\_strat  | boot       |  0.0188158|  0.0023386|  0.0483588|
+| Both models wrong     |   500| ls  | ate\_dr     | gn         |  0.4598088|  0.2185495|  0.4674928|
+| Both models wrong     |  2000| ls  | ate\_dr     | gn         |  0.6306907|  0.2232589|  0.4725028|
+| Both models wrong     |  8000| ls  | ate\_dr     | gn         |  0.7554376|  0.1818507|  0.4264396|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | gn         |  0.0713318|  0.0529904|  0.2301964|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | gn         |  0.0124034|  0.0111196|  0.1054494|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | gn         |  0.0020000|  0.0020000|  0.0447214|
+| Both models wrong     |   500| ls  | ate\_regr   | gn         |  0.4574692|  0.2216989|  0.4708491|
+| Both models wrong     |  2000| ls  | ate\_regr   | gn         |  0.3569059|  0.2210108|  0.4701178|
+| Both models wrong     |  8000| ls  | ate\_regr   | gn         |  0.2425624|  0.1808229|  0.4252327|
+| Both models wrong     |   500| ls  | ate\_strat  | gn         |  0.0113901|  0.0080715|  0.0898415|
+| Both models wrong     |  2000| ls  | ate\_strat  | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Both models wrong     |  8000| ls  | ate\_strat  | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Both models wrong     |   500| ls  | ate\_dr     | hybrid\_gn |  0.4614313|  0.2031487|  0.4507202|
+| Both models wrong     |  2000| ls  | ate\_dr     | hybrid\_gn |  0.6298884|  0.2192103|  0.4681990|
+| Both models wrong     |  8000| ls  | ate\_dr     | hybrid\_gn |  0.7668638|  0.1757847|  0.4192669|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0528498|  0.0341895|  0.1849040|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0098193|  0.0084199|  0.0917603|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0019829|  0.0019659|  0.0443380|
+| Both models wrong     |   500| ls  | ate\_regr   | hybrid\_gn |  0.4720133|  0.2060561|  0.4539341|
+| Both models wrong     |  2000| ls  | ate\_regr   | hybrid\_gn |  0.3602923|  0.2168791|  0.4657028|
+| Both models wrong     |  8000| ls  | ate\_regr   | hybrid\_gn |  0.2311534|  0.1747033|  0.4179753|
+| Both models wrong     |   500| ls  | ate\_strat  | hybrid\_gn |  0.0137056|  0.0084492|  0.0919195|
+| Both models wrong     |  2000| ls  | ate\_strat  | hybrid\_gn |  0.0000000|  0.0000000|  0.0000000|
+| Both models wrong     |  8000| ls  | ate\_strat  | hybrid\_gn |  0.0000000|  0.0000000|  0.0000000|
+| Both models wrong     |   500| ls  | ate\_dr     | none       |  0.2561976|  0.0460657|  0.2146291|
+| Both models wrong     |  2000| ls  | ate\_dr     | none       |  0.2223630|  0.0359462|  0.1895948|
+| Both models wrong     |  8000| ls  | ate\_dr     | none       |  0.1532203|  0.0183281|  0.1353813|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | none       |  0.0439757|  0.0087442|  0.0935104|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | none       |  0.0167344|  0.0027902|  0.0528225|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | none       |  0.0027221|  0.0001844|  0.0135796|
+| Both models wrong     |   500| ls  | ate\_regr   | none       |  0.6072639|  0.0484168|  0.2200381|
+| Both models wrong     |  2000| ls  | ate\_regr   | none       |  0.6626197|  0.0306048|  0.1749423|
+| Both models wrong     |  8000| ls  | ate\_regr   | none       |  0.7229250|  0.0169579|  0.1302226|
+| Both models wrong     |   500| ls  | ate\_strat  | none       |  0.0925628|  0.0085466|  0.0924477|
+| Both models wrong     |  2000| ls  | ate\_strat  | none       |  0.0982829|  0.0088598|  0.0941265|
+| Both models wrong     |  8000| ls  | ate\_strat  | none       |  0.1211326|  0.0075716|  0.0870151|
+| Both models wrong     |   500| ls  | ate\_dr     | null       |  0.4614313|  0.2031487|  0.4507202|
+| Both models wrong     |  2000| ls  | ate\_dr     | null       |  0.6298884|  0.2192103|  0.4681990|
+| Both models wrong     |  8000| ls  | ate\_dr     | null       |  0.7668638|  0.1757847|  0.4192669|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | null       |  0.0528498|  0.0341895|  0.1849040|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | null       |  0.0098193|  0.0084199|  0.0917603|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | null       |  0.0019829|  0.0019659|  0.0443380|
+| Both models wrong     |   500| ls  | ate\_regr   | null       |  0.4720133|  0.2060561|  0.4539341|
+| Both models wrong     |  2000| ls  | ate\_regr   | null       |  0.3602923|  0.2168791|  0.4657028|
+| Both models wrong     |  8000| ls  | ate\_regr   | null       |  0.2311534|  0.1747033|  0.4179753|
+| Both models wrong     |   500| ls  | ate\_strat  | null       |  0.0137056|  0.0084492|  0.0919195|
+| Both models wrong     |  2000| ls  | ate\_strat  | null       |  0.0000000|  0.0000000|  0.0000000|
+| Both models wrong     |  8000| ls  | ate\_strat  | null       |  0.0000000|  0.0000000|  0.0000000|
+| Both models wrong     |   500| ls  | ate\_dr     | old        |  0.3954713|  0.0607616|  0.2464987|
+| Both models wrong     |  2000| ls  | ate\_dr     | old        |  0.4381335|  0.0682521|  0.2612509|
+| Both models wrong     |  8000| ls  | ate\_dr     | old        |  0.4928504|  0.0771820|  0.2778165|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | old        |  0.0434785|  0.0102938|  0.1014585|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | old        |  0.0107042|  0.0017830|  0.0422250|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | old        |  0.0006113|  0.0000421|  0.0064918|
+| Both models wrong     |   500| ls  | ate\_regr   | old        |  0.4784135|  0.0531084|  0.2304527|
+| Both models wrong     |  2000| ls  | ate\_regr   | old        |  0.5018880|  0.0498551|  0.2232825|
+| Both models wrong     |  8000| ls  | ate\_regr   | old        |  0.4881443|  0.0652582|  0.2554568|
+| Both models wrong     |   500| ls  | ate\_strat  | old        |  0.0826367|  0.0176443|  0.1328319|
+| Both models wrong     |  2000| ls  | ate\_strat  | old        |  0.0492744|  0.0116567|  0.1079664|
+| Both models wrong     |  8000| ls  | ate\_strat  | old        |  0.0183940|  0.0022550|  0.0474874|
+| Both models wrong     |   500| ls  | ate\_dr     | shrunk     |  0.2561992|  0.0460657|  0.2146292|
+| Both models wrong     |  2000| ls  | ate\_dr     | shrunk     |  0.2223633|  0.0359462|  0.1895949|
+| Both models wrong     |  8000| ls  | ate\_dr     | shrunk     |  0.1532204|  0.0183281|  0.1353813|
+| Both models wrong     |   500| ls  | ate\_ipw\_2 | shrunk     |  0.0439754|  0.0087441|  0.0935098|
+| Both models wrong     |  2000| ls  | ate\_ipw\_2 | shrunk     |  0.0167343|  0.0027902|  0.0528224|
+| Both models wrong     |  8000| ls  | ate\_ipw\_2 | shrunk     |  0.0027221|  0.0001844|  0.0135796|
+| Both models wrong     |   500| ls  | ate\_regr   | shrunk     |  0.6072632|  0.0484167|  0.2200379|
+| Both models wrong     |  2000| ls  | ate\_regr   | shrunk     |  0.6626198|  0.0306048|  0.1749424|
+| Both models wrong     |  8000| ls  | ate\_regr   | shrunk     |  0.7229251|  0.0169579|  0.1302226|
+| Both models wrong     |   500| ls  | ate\_strat  | shrunk     |  0.0925622|  0.0085465|  0.0924470|
+| Both models wrong     |  2000| ls  | ate\_strat  | shrunk     |  0.0982826|  0.0088598|  0.0941263|
+| Both models wrong     |  8000| ls  | ate\_strat  | shrunk     |  0.1211325|  0.0075716|  0.0870151|
+| Outcome model correct |   500| ls  | ate\_dr     | all\_boot  |  0.2949420|  0.0502841|  0.2242412|
+| Outcome model correct |  2000| ls  | ate\_dr     | all\_boot  |  0.2475785|  0.0597321|  0.2444016|
+| Outcome model correct |  8000| ls  | ate\_dr     | all\_boot  |  0.1887470|  0.0565697|  0.2378438|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | all\_boot  |  0.0031531|  0.0000577|  0.0075991|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | all\_boot  |  0.0017582|  0.0000193|  0.0043963|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | all\_boot  |  0.0008434|  0.0000051|  0.0022495|
+| Outcome model correct |   500| ls  | ate\_regr   | all\_boot  |  0.6956148|  0.0484106|  0.2200242|
+| Outcome model correct |  2000| ls  | ate\_regr   | all\_boot  |  0.7467026|  0.0580427|  0.2409204|
+| Outcome model correct |  8000| ls  | ate\_regr   | all\_boot  |  0.8083656|  0.0557594|  0.2361342|
+| Outcome model correct |   500| ls  | ate\_strat  | all\_boot  |  0.0062901|  0.0001870|  0.0136766|
+| Outcome model correct |  2000| ls  | ate\_strat  | all\_boot  |  0.0039607|  0.0000533|  0.0073014|
+| Outcome model correct |  8000| ls  | ate\_strat  | all\_boot  |  0.0020440|  0.0000134|  0.0036607|
+| Outcome model correct |   500| ls  | ate\_dr     | boot       |  0.2936121|  0.0502167|  0.2240908|
+| Outcome model correct |  2000| ls  | ate\_dr     | boot       |  0.2471648|  0.0611788|  0.2473435|
+| Outcome model correct |  8000| ls  | ate\_dr     | boot       |  0.1882529|  0.0567021|  0.2381219|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | boot       |  0.0032969|  0.0000591|  0.0076902|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | boot       |  0.0017621|  0.0000193|  0.0043925|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | boot       |  0.0008537|  0.0000050|  0.0022418|
+| Outcome model correct |   500| ls  | ate\_regr   | boot       |  0.6968467|  0.0483479|  0.2198816|
+| Outcome model correct |  2000| ls  | ate\_regr   | boot       |  0.7470569|  0.0594480|  0.2438196|
+| Outcome model correct |  8000| ls  | ate\_regr   | boot       |  0.8089065|  0.0559082|  0.2364491|
+| Outcome model correct |   500| ls  | ate\_strat  | boot       |  0.0062442|  0.0001864|  0.0136516|
+| Outcome model correct |  2000| ls  | ate\_strat  | boot       |  0.0040162|  0.0000555|  0.0074522|
+| Outcome model correct |  8000| ls  | ate\_strat  | boot       |  0.0019869|  0.0000132|  0.0036273|
+| Outcome model correct |   500| ls  | ate\_dr     | gn         |  0.5373635|  0.2129527|  0.4614680|
+| Outcome model correct |  2000| ls  | ate\_dr     | gn         |  0.6477503|  0.2229848|  0.4722126|
+| Outcome model correct |  8000| ls  | ate\_dr     | gn         |  0.5420721|  0.2422583|  0.4921974|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | gn         |  0.0046300|  0.0010485|  0.0323811|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Outcome model correct |   500| ls  | ate\_regr   | gn         |  0.4580065|  0.2110178|  0.4593667|
+| Outcome model correct |  2000| ls  | ate\_regr   | gn         |  0.3522497|  0.2229848|  0.4722126|
+| Outcome model correct |  8000| ls  | ate\_regr   | gn         |  0.4579279|  0.2422583|  0.4921974|
+| Outcome model correct |   500| ls  | ate\_strat  | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Outcome model correct |  2000| ls  | ate\_strat  | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Outcome model correct |  8000| ls  | ate\_strat  | gn         |  0.0000000|  0.0000000|  0.0000000|
+| Outcome model correct |   500| ls  | ate\_dr     | hybrid\_gn |  0.1838944|  0.0633574|  0.2517089|
+| Outcome model correct |  2000| ls  | ate\_dr     | hybrid\_gn |  0.1385061|  0.0555449|  0.2356796|
+| Outcome model correct |  8000| ls  | ate\_dr     | hybrid\_gn |  0.0990568|  0.0391313|  0.1978163|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0047130|  0.0001293|  0.0113700|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0016846|  0.0000184|  0.0042837|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0010869|  0.0000079|  0.0028184|
+| Outcome model correct |   500| ls  | ate\_regr   | hybrid\_gn |  0.8020246|  0.0626518|  0.2503034|
+| Outcome model correct |  2000| ls  | ate\_regr   | hybrid\_gn |  0.8540243|  0.0548296|  0.2341572|
+| Outcome model correct |  8000| ls  | ate\_regr   | hybrid\_gn |  0.8970214|  0.0386651|  0.1966344|
+| Outcome model correct |   500| ls  | ate\_strat  | hybrid\_gn |  0.0093680|  0.0003035|  0.0174208|
+| Outcome model correct |  2000| ls  | ate\_strat  | hybrid\_gn |  0.0057850|  0.0000955|  0.0097737|
+| Outcome model correct |  8000| ls  | ate\_strat  | hybrid\_gn |  0.0028349|  0.0000228|  0.0047798|
+| Outcome model correct |   500| ls  | ate\_dr     | none       |  0.1553515|  0.0255136|  0.1597297|
+| Outcome model correct |  2000| ls  | ate\_dr     | none       |  0.0843213|  0.0097648|  0.0988169|
+| Outcome model correct |  8000| ls  | ate\_dr     | none       |  0.0423389|  0.0038591|  0.0621218|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | none       |  0.0032839|  0.0000412|  0.0064188|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | none       |  0.0025602|  0.0000227|  0.0047599|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | none       |  0.0016381|  0.0000114|  0.0033801|
+| Outcome model correct |   500| ls  | ate\_regr   | none       |  0.8389582|  0.0258343|  0.1607304|
+| Outcome model correct |  2000| ls  | ate\_regr   | none       |  0.9103068|  0.0099639|  0.0998195|
+| Outcome model correct |  8000| ls  | ate\_regr   | none       |  0.9532374|  0.0038725|  0.0622292|
+| Outcome model correct |   500| ls  | ate\_strat  | none       |  0.0024063|  0.0000208|  0.0045570|
+| Outcome model correct |  2000| ls  | ate\_strat  | none       |  0.0028117|  0.0000237|  0.0048669|
+| Outcome model correct |  8000| ls  | ate\_strat  | none       |  0.0027856|  0.0000192|  0.0043813|
+| Outcome model correct |   500| ls  | ate\_dr     | null       |  0.1838944|  0.0633574|  0.2517089|
+| Outcome model correct |  2000| ls  | ate\_dr     | null       |  0.1385061|  0.0555449|  0.2356796|
+| Outcome model correct |  8000| ls  | ate\_dr     | null       |  0.0990568|  0.0391313|  0.1978163|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | null       |  0.0047130|  0.0001293|  0.0113700|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | null       |  0.0016846|  0.0000184|  0.0042837|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | null       |  0.0010869|  0.0000079|  0.0028184|
+| Outcome model correct |   500| ls  | ate\_regr   | null       |  0.8020246|  0.0626518|  0.2503034|
+| Outcome model correct |  2000| ls  | ate\_regr   | null       |  0.8540243|  0.0548296|  0.2341572|
+| Outcome model correct |  8000| ls  | ate\_regr   | null       |  0.8970214|  0.0386651|  0.1966344|
+| Outcome model correct |   500| ls  | ate\_strat  | null       |  0.0093680|  0.0003035|  0.0174208|
+| Outcome model correct |  2000| ls  | ate\_strat  | null       |  0.0057850|  0.0000955|  0.0097737|
+| Outcome model correct |  8000| ls  | ate\_strat  | null       |  0.0028349|  0.0000228|  0.0047798|
+| Outcome model correct |   500| ls  | ate\_dr     | old        |  0.2935161|  0.0498980|  0.2233787|
+| Outcome model correct |  2000| ls  | ate\_dr     | old        |  0.2489386|  0.0602520|  0.2454629|
+| Outcome model correct |  8000| ls  | ate\_dr     | old        |  0.1873294|  0.0560815|  0.2368154|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | old        |  0.0034541|  0.0000667|  0.0081687|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | old        |  0.0017994|  0.0000203|  0.0045061|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | old        |  0.0008433|  0.0000050|  0.0022457|
+| Outcome model correct |   500| ls  | ate\_regr   | old        |  0.6970000|  0.0480412|  0.2191831|
+| Outcome model correct |  2000| ls  | ate\_regr   | old        |  0.7453318|  0.0585417|  0.2419540|
+| Outcome model correct |  8000| ls  | ate\_regr   | old        |  0.8098173|  0.0552865|  0.2351308|
+| Outcome model correct |   500| ls  | ate\_strat  | old        |  0.0060297|  0.0001776|  0.0133251|
+| Outcome model correct |  2000| ls  | ate\_strat  | old        |  0.0039302|  0.0000534|  0.0073086|
+| Outcome model correct |  8000| ls  | ate\_strat  | old        |  0.0020100|  0.0000132|  0.0036301|
+| Outcome model correct |   500| ls  | ate\_dr     | shrunk     |  0.1553529|  0.0255136|  0.1597298|
+| Outcome model correct |  2000| ls  | ate\_dr     | shrunk     |  0.0843214|  0.0097648|  0.0988170|
+| Outcome model correct |  8000| ls  | ate\_dr     | shrunk     |  0.0423389|  0.0038591|  0.0621218|
+| Outcome model correct |   500| ls  | ate\_ipw\_2 | shrunk     |  0.0032838|  0.0000412|  0.0064186|
+| Outcome model correct |  2000| ls  | ate\_ipw\_2 | shrunk     |  0.0025602|  0.0000227|  0.0047598|
+| Outcome model correct |  8000| ls  | ate\_ipw\_2 | shrunk     |  0.0016380|  0.0000114|  0.0033801|
+| Outcome model correct |   500| ls  | ate\_regr   | shrunk     |  0.8389571|  0.0258343|  0.1607305|
+| Outcome model correct |  2000| ls  | ate\_regr   | shrunk     |  0.9103067|  0.0099639|  0.0998195|
+| Outcome model correct |  8000| ls  | ate\_regr   | shrunk     |  0.9532374|  0.0038725|  0.0622292|
+| Outcome model correct |   500| ls  | ate\_strat  | shrunk     |  0.0024062|  0.0000208|  0.0045568|
+| Outcome model correct |  2000| ls  | ate\_strat  | shrunk     |  0.0028116|  0.0000237|  0.0048668|
+| Outcome model correct |  8000| ls  | ate\_strat  | shrunk     |  0.0027856|  0.0000192|  0.0043812|
+| PS model correct      |   500| ls  | ate\_dr     | all\_boot  |  0.3389617|  0.0705279|  0.2655709|
+| PS model correct      |  2000| ls  | ate\_dr     | all\_boot  |  0.7623701|  0.0592896|  0.2434946|
+| PS model correct      |  8000| ls  | ate\_dr     | all\_boot  |  0.8938228|  0.0327026|  0.1808386|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | all\_boot  |  0.1655272|  0.0660271|  0.2569574|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | all\_boot  |  0.0755315|  0.0306964|  0.1752039|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | all\_boot  |  0.0454615|  0.0190960|  0.1381882|
+| PS model correct      |   500| ls  | ate\_regr   | all\_boot  |  0.3517316|  0.0719562|  0.2682465|
+| PS model correct      |  2000| ls  | ate\_regr   | all\_boot  |  0.1030241|  0.0161436|  0.1270575|
+| PS model correct      |  8000| ls  | ate\_regr   | all\_boot  |  0.0360186|  0.0035001|  0.0591621|
+| PS model correct      |   500| ls  | ate\_strat  | all\_boot  |  0.1437796|  0.0384061|  0.1959749|
+| PS model correct      |  2000| ls  | ate\_strat  | all\_boot  |  0.0590743|  0.0136915|  0.1170105|
+| PS model correct      |  8000| ls  | ate\_strat  | all\_boot  |  0.0246972|  0.0037414|  0.0611673|
+| PS model correct      |   500| ls  | ate\_dr     | boot       |  0.3078676|  0.0629441|  0.2508865|
+| PS model correct      |  2000| ls  | ate\_dr     | boot       |  0.7562039|  0.0589148|  0.2427237|
+| PS model correct      |  8000| ls  | ate\_dr     | boot       |  0.8956828|  0.0325381|  0.1803831|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | boot       |  0.1353425|  0.0449127|  0.2119262|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | boot       |  0.0746259|  0.0299779|  0.1731413|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | boot       |  0.0451496|  0.0187187|  0.1368162|
+| PS model correct      |   500| ls  | ate\_regr   | boot       |  0.4043717|  0.0689239|  0.2625336|
+| PS model correct      |  2000| ls  | ate\_regr   | boot       |  0.1082675|  0.0166021|  0.1288491|
+| PS model correct      |  8000| ls  | ate\_regr   | boot       |  0.0349252|  0.0033890|  0.0582153|
+| PS model correct      |   500| ls  | ate\_strat  | boot       |  0.1524182|  0.0404143|  0.2010331|
+| PS model correct      |  2000| ls  | ate\_strat  | boot       |  0.0609027|  0.0145005|  0.1204178|
+| PS model correct      |  8000| ls  | ate\_strat  | boot       |  0.0242425|  0.0036876|  0.0607258|
+| PS model correct      |   500| ls  | ate\_dr     | gn         |  0.4616448|  0.1646759|  0.4058027|
+| PS model correct      |  2000| ls  | ate\_dr     | gn         |  0.8208489|  0.1149055|  0.3389771|
+| PS model correct      |  8000| ls  | ate\_dr     | gn         |  0.7937150|  0.1312329|  0.3622609|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | gn         |  0.1584645|  0.0649920|  0.2549354|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | gn         |  0.1343922|  0.0879804|  0.2966149|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | gn         |  0.1827155|  0.1209209|  0.3477368|
+| PS model correct      |   500| ls  | ate\_regr   | gn         |  0.2657857|  0.1172771|  0.3424574|
+| PS model correct      |  2000| ls  | ate\_regr   | gn         |  0.0265094|  0.0162995|  0.1276697|
+| PS model correct      |  8000| ls  | ate\_regr   | gn         |  0.0151341|  0.0076156|  0.0872673|
+| PS model correct      |   500| ls  | ate\_strat  | gn         |  0.1141049|  0.0541138|  0.2326237|
+| PS model correct      |  2000| ls  | ate\_strat  | gn         |  0.0182495|  0.0087601|  0.0935954|
+| PS model correct      |  8000| ls  | ate\_strat  | gn         |  0.0084354|  0.0045650|  0.0675651|
+| PS model correct      |   500| ls  | ate\_dr     | hybrid\_gn |  0.4069152|  0.1318035|  0.3630475|
+| PS model correct      |  2000| ls  | ate\_dr     | hybrid\_gn |  0.7835226|  0.0850175|  0.2915776|
+| PS model correct      |  8000| ls  | ate\_dr     | hybrid\_gn |  0.8565318|  0.0616216|  0.2482370|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | hybrid\_gn |  0.1114304|  0.0327077|  0.1808528|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0705703|  0.0308443|  0.1756255|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | hybrid\_gn |  0.0528014|  0.0290378|  0.1704047|
+| PS model correct      |   500| ls  | ate\_regr   | hybrid\_gn |  0.3286744|  0.1023254|  0.3198834|
+| PS model correct      |  2000| ls  | ate\_regr   | hybrid\_gn |  0.0773657|  0.0260929|  0.1615329|
+| PS model correct      |  8000| ls  | ate\_regr   | hybrid\_gn |  0.0410090|  0.0119839|  0.1094710|
+| PS model correct      |   500| ls  | ate\_strat  | hybrid\_gn |  0.1529801|  0.0556887|  0.2359846|
+| PS model correct      |  2000| ls  | ate\_strat  | hybrid\_gn |  0.0685413|  0.0307271|  0.1752914|
+| PS model correct      |  8000| ls  | ate\_strat  | hybrid\_gn |  0.0496577|  0.0205996|  0.1435255|
+| PS model correct      |   500| ls  | ate\_dr     | none       |  0.1175140|  0.0165525|  0.1286567|
+| PS model correct      |  2000| ls  | ate\_dr     | none       |  0.1963232|  0.0235734|  0.1535365|
+| PS model correct      |  8000| ls  | ate\_dr     | none       |  0.1414623|  0.0123712|  0.1112258|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | none       |  0.0391034|  0.0030069|  0.0548348|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | none       |  0.0213406|  0.0025115|  0.0501145|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | none       |  0.0060723|  0.0005079|  0.0225364|
+| PS model correct      |   500| ls  | ate\_regr   | none       |  0.6949128|  0.0174020|  0.1319166|
+| PS model correct      |  2000| ls  | ate\_regr   | none       |  0.6367426|  0.0161610|  0.1271259|
+| PS model correct      |  8000| ls  | ate\_regr   | none       |  0.6678718|  0.0075625|  0.0869625|
+| PS model correct      |   500| ls  | ate\_strat  | none       |  0.1484698|  0.0055321|  0.0743779|
+| PS model correct      |  2000| ls  | ate\_strat  | none       |  0.1455936|  0.0058129|  0.0762421|
+| PS model correct      |  8000| ls  | ate\_strat  | none       |  0.1845936|  0.0052086|  0.0721709|
+| PS model correct      |   500| ls  | ate\_dr     | null       |  0.4069152|  0.1318035|  0.3630475|
+| PS model correct      |  2000| ls  | ate\_dr     | null       |  0.7835226|  0.0850175|  0.2915776|
+| PS model correct      |  8000| ls  | ate\_dr     | null       |  0.8565318|  0.0616216|  0.2482370|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | null       |  0.1114304|  0.0327077|  0.1808528|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | null       |  0.0705703|  0.0308443|  0.1756255|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | null       |  0.0528014|  0.0290378|  0.1704047|
+| PS model correct      |   500| ls  | ate\_regr   | null       |  0.3286744|  0.1023254|  0.3198834|
+| PS model correct      |  2000| ls  | ate\_regr   | null       |  0.0773657|  0.0260929|  0.1615329|
+| PS model correct      |  8000| ls  | ate\_regr   | null       |  0.0410090|  0.0119839|  0.1094710|
+| PS model correct      |   500| ls  | ate\_strat  | null       |  0.1529801|  0.0556887|  0.2359846|
+| PS model correct      |  2000| ls  | ate\_strat  | null       |  0.0685413|  0.0307271|  0.1752914|
+| PS model correct      |  8000| ls  | ate\_strat  | null       |  0.0496577|  0.0205996|  0.1435255|
+| PS model correct      |   500| ls  | ate\_dr     | old        |  0.2911024|  0.0681420|  0.2610402|
+| PS model correct      |  2000| ls  | ate\_dr     | old        |  0.7461405|  0.0698046|  0.2642056|
+| PS model correct      |  8000| ls  | ate\_dr     | old        |  0.8894719|  0.0375676|  0.1938236|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | old        |  0.1406659|  0.0473470|  0.2175936|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | old        |  0.0830356|  0.0321703|  0.1793609|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | old        |  0.0481413|  0.0204340|  0.1429476|
+| PS model correct      |   500| ls  | ate\_regr   | old        |  0.3923628|  0.0689841|  0.2626482|
+| PS model correct      |  2000| ls  | ate\_regr   | old        |  0.1047108|  0.0166565|  0.1290599|
+| PS model correct      |  8000| ls  | ate\_regr   | old        |  0.0365716|  0.0036082|  0.0600681|
+| PS model correct      |   500| ls  | ate\_strat  | old        |  0.1758689|  0.0474505|  0.2178315|
+| PS model correct      |  2000| ls  | ate\_strat  | old        |  0.0661131|  0.0168388|  0.1297642|
+| PS model correct      |  8000| ls  | ate\_strat  | old        |  0.0258152|  0.0044443|  0.0666657|
+| PS model correct      |   500| ls  | ate\_dr     | shrunk     |  0.1175161|  0.0165529|  0.1286580|
+| PS model correct      |  2000| ls  | ate\_dr     | shrunk     |  0.1963245|  0.0235735|  0.1535368|
+| PS model correct      |  8000| ls  | ate\_dr     | shrunk     |  0.1414626|  0.0123712|  0.1112259|
+| PS model correct      |   500| ls  | ate\_ipw\_2 | shrunk     |  0.0391043|  0.0030069|  0.0548349|
+| PS model correct      |  2000| ls  | ate\_ipw\_2 | shrunk     |  0.0213406|  0.0025115|  0.0501146|
+| PS model correct      |  8000| ls  | ate\_ipw\_2 | shrunk     |  0.0060723|  0.0005079|  0.0225365|
+| PS model correct      |   500| ls  | ate\_regr   | shrunk     |  0.6949088|  0.0174016|  0.1319151|
+| PS model correct      |  2000| ls  | ate\_regr   | shrunk     |  0.6367417|  0.0161610|  0.1271260|
+| PS model correct      |  8000| ls  | ate\_regr   | shrunk     |  0.6678716|  0.0075625|  0.0869625|
+| PS model correct      |   500| ls  | ate\_strat  | shrunk     |  0.1484708|  0.0055321|  0.0743780|
+| PS model correct      |  2000| ls  | ate\_strat  | shrunk     |  0.1455932|  0.0058129|  0.0762422|
+| PS model correct      |  8000| ls  | ate\_strat  | shrunk     |  0.1845935|  0.0052086|  0.0721710|
