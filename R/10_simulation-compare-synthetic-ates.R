@@ -214,7 +214,7 @@ for (dd in c('ls', 'iw')) {
                    fail_on_error = FALSE
       )
       saveRDS(sim_res, 
-              here(glue('results/comparison_sim_{dd}_{jj}.rds'))
+              here(glue('results/comparison_sim_{dd}.rds'))
       )
       theta_res <- map(sim_res, 'thetas') %>%
         bind_rows(.id = 'sim') %>%
@@ -222,7 +222,7 @@ for (dd in c('ls', 'iw')) {
         select(-(theta_0:shrunk))
       write_csv(theta_res,
                 here(
-                  glue('results/comparison_sim_thetas_{dd}_{jj}.csv')
+                  glue('results/comparison_sim_thetas_{dd}.csv')
                 ))
       mse_res <- theta_res %>%
         group_by(j, n, d, type) %>%
@@ -237,7 +237,7 @@ for (dd in c('ls', 'iw')) {
         inner_join(this_sim) %>%
         select(-(theta_0:shrunk))
       write_csv(b_res, here(
-        glue('results/comparison_sim_bs_{dd}_{jj}.csv')
+        glue('results/comparison_sim_bs_{dd}.csv')
       ))
       
       b_sum <- b_res %>%
