@@ -218,8 +218,8 @@ for (dd in c('ls', 'iw')) {
                        strat_ate),
                      B = 200,
                      d = dd),
-                   n_jobs = 500,
-                   memory = 2000,
+                   n_jobs = 100,
+                   memory = 1000,
                    fail_on_error = FALSE
       )
       saveRDS(sim_res, 
