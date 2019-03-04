@@ -164,12 +164,21 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
     mutate(type = c('old', 'boot', 'all_boot', 'null', 'gn', 'hybrid_gn', 'none', 'shrunk'),
            true_ate = gen_mod$true_ate)
   
+  all_regular_thetas <- gather(thetahat, theta_0, ate) %>%
+    mutate(synthetic = FALSE,
+           var = NA,
+           shrunk = FALSE,
+           type = 'raw',
+           true_ate = gen_mod$true_ate)
+  
+  all_thetas <- all_regular_thetas %>%
+    full_join(all_synthetic_thetas)
   all_bs <- map(alvvays, 'b_res') %>%
     bind_rows %>%
     filter(!shrunk) %>%
     mutate(type = rep(c('old', 'boot', 'all_boot', 'null', 'gn', 'hybrid_gn', 'none', 'shrunk'), each = 4))
   
-  return(list(thetas = all_synthetic_thetas,
+  return(list(thetas = all_thetas,
               bs = all_bs))
   
 }
@@ -181,16 +190,16 @@ sim_parameters <- expand.grid(
   d = c('ls', 'iw')
 )
 
-# tree_sim(j = 2,
-#                   n = 500,
-#                   s = 1,
-#                   ate_list = list(
-#                     ipw2_ate,
-#                     regr_ate,
-#                     dr_ate,
-#                     strat_ate),
-#                   B = 20,
-#                   d = 'ls')
+tree_sim(j = 2,
+                  n = 500,
+                  s = 1,
+                  ate_list = list(
+                    ipw2_ate,
+                    regr_ate,
+                    dr_ate,
+                    strat_ate),
+                  B = 20,
+                  d = 'ls')
 for (dd in c('ls', 'iw')) {
       this_sim <- sim_parameters %>%
         filter(d == dd) 
