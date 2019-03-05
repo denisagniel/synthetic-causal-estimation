@@ -1,12 +1,3 @@
-#' ---
-#' title: "Simulation to "
-#' output: github_document
-#' ---
-#' 
-library(knitr)
-opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 7, fig.height = 7)
-
-#'
 
 # devtools::install_github('denisagniel/synthate')
 library(dplyr)
@@ -148,16 +139,16 @@ sim_parameters <- expand.grid(
   d = c('ls', 'iw')
 )
 # 
-tree_sim(j = 2,
-                  n = 500,
-                  s = 1,
-                  ate_list = list(
-                    ipw2_ate,
-                    regr_ate,
-                    dr_ate,
-                    strat_ate),
-                  B = 20,
-                  d = 'ls')
+# tree_sim(j = 2,
+#                   n = 500,
+#                   s = 1,
+#                   ate_list = list(
+#                     ipw2_ate,
+#                     regr_ate,
+#                     dr_ate,
+#                     strat_ate),
+#                   B = 20,
+#                   d = 'ls')
 for (dd in c('ls', 'iw')) {
   this_sim <- sim_parameters %>%
     filter(d == dd) 
