@@ -1,12 +1,3 @@
-#' ---
-#' title: "Simulation to "
-#' output: github_document
-#' ---
-#' 
-library(knitr)
-opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 7, fig.height = 7)
-
-#'
 
 # devtools::install_github('denisagniel/synthate')
 library(dplyr)
@@ -148,22 +139,28 @@ sim_parameters <- expand.grid(
   d = c('ls', 'iw')
 )
 # 
-tree_sim(j = 2,
-                  n = 500,
-                  s = 1,
-                  ate_list = list(
-                    ipw2_ate,
-                    regr_ate,
-                    dr_ate,
-                    strat_ate),
-                  B = 20,
-                  d = 'ls')
+# tree_sim(j = 2,
+#                   n = 500,
+#                   s = 1,
+#                   ate_list = list(
+#                     ipw2_ate,
+#                     regr_ate,
+#                     dr_ate,
+#                     strat_ate),
+#                   B = 20,
+#                   d = 'ls')
 for (dd in c('ls', 'iw')) {
   this_sim <- sim_parameters %>%
     filter(d == dd) 
   this_sim <- this_sim %>%
     mutate(sim = as.character(1:nrow(this_sim)))
   
+  options(
+    clustermq.defaults = list(ptn="short",
+                              log_file="Rout/log%a.log",
+                              time_amt = "12:00:00"
+    )
+  )
   sim_res <- Q(tree_sim, 
                j = this_sim$j,
                n = this_sim$n,
@@ -176,7 +173,7 @@ for (dd in c('ls', 'iw')) {
                    strat_ate),
                  B = 200,
                  d = dd),
-               n_jobs = 100,
+               n_jobs = 250,
                memory = 1000,
                fail_on_error = FALSE
   )
