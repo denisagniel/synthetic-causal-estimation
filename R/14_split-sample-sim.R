@@ -147,7 +147,7 @@ sim_parameters <- expand.grid(
   n = c(500, 2000),
   d = c('ls', 'iw')
 )
-
+# 
 tree_sim(j = 2,
                   n = 500,
                   s = 1,
@@ -185,8 +185,7 @@ for (dd in c('ls', 'iw')) {
   )
   theta_res <- map(sim_res, 'thetas') %>%
     bind_rows(.id = 'sim') %>%
-    inner_join(this_sim) %>%
-    select(-(theta_0:shrunk))
+    inner_join(this_sim)
   write_csv(theta_res,
             here(
               glue('results/comparison_sim_thetas_{dd}.csv')
@@ -201,8 +200,7 @@ for (dd in c('ls', 'iw')) {
   
   b_res <- map(sim_res, 'bs') %>%
     bind_rows(.id = 'sim') %>%
-    inner_join(this_sim) %>%
-    select(-(theta_0:shrunk))
+    inner_join(this_sim)
   write_csv(b_res, here(
     glue('results/comparison_sim_bs_{dd}.csv')
   ))
