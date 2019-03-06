@@ -136,8 +136,15 @@ sim_parameters <- expand.grid(
   run = 1:500,
   j = 1:4,
   n = c(500, 2000),
-  d = c('ls', 'iw')
+  d = c('ls')
 )
+# sim_parameters <- expand.grid(
+#   run = 1:3,
+#   j = 1:4,
+#   n = c(500),
+#   d = 'ls'
+# )
+
 # 
 # tree_sim(j = 2,
 #                   n = 500,
@@ -147,9 +154,9 @@ sim_parameters <- expand.grid(
 #                     regr_ate,
 #                     dr_ate,
 #                     strat_ate),
-#                   B = 20,
+#                   B = 200,
 #                   d = 'ls')
-for (dd in c('ls', 'iw')) {
+for (dd in c('ls')) {
   this_sim <- sim_parameters %>%
     filter(d == dd) 
   this_sim <- this_sim %>%
@@ -173,9 +180,7 @@ for (dd in c('ls', 'iw')) {
                    strat_ate),
                  B = 200,
                  d = dd),
-               n_jobs = 250,
-               memory = 1000,
-               fail_on_error = FALSE
+               n_jobs = 500
   )
   saveRDS(sim_res, 
           here(glue('results/comparison_sim_{dd}.rds'))
