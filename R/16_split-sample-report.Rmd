@@ -44,6 +44,8 @@ theta1 <- map(all_sims, 'all_thetas') %>%
                          j == 3 ~ 'Outcome model correct',
                          j == 4 ~ 'Both models wrong'),
          estimator = paste0(type, '-', splits))
+write_csv(theta1, 
+          here('results/thetas_ls.csv'))
 mse_res <- theta1 %>%
         group_by(j_d, n, d, estimator) %>%
         summarise(mse = mean((ate + 0.4)^2),
@@ -82,6 +84,8 @@ b1 <- map(all_sims, 'all_bs') %>%
                          j == 3 ~ 'Outcome model correct',
                          j == 4 ~ 'Both models wrong'),
          estimator = paste0(type, '-', splits))
+write_csv(b1, 
+          here('results/bs_ls.csv'))
 b_sum <- b1 %>%
         group_by(j_d, n, d, est, estimator) %>%
         summarise(bhat = mean(b),
