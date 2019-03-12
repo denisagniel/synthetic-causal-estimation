@@ -1,0 +1,104 @@
+---
+title: "Split-sample sims"
+output:
+  github_document
+---
+
+In these simulations, I consider a set of different synthetic estimators. When $\theta_0$ is specified, it is the DR. Leacy and Stuart is used throughout. The synthetic estimators are as follows:
+
+- *Old*: this is the original way we have always done things, using raw differences: $\hat{\Delta} = \hat{\theta}_i - \hat{\theta}_0$. 
+- *Shrunk*: this uses the raw differences but scales them by $n$: $\hat{\Delta} = n^{-1}(\hat{\theta}_i - \hat{\theta}_0)$.
+- *Null*: this is the so-called tree-based method we've been using, where we remove the estimated treatment effect (according to causal forest) and then bootstrap, and compare to a null ATE.
+- *Hybrid_gn*: this uses the typical bootstrap, but the bias is estimated by comparing to the causal forest ATE.
+
+We also compare to the four candidate estimators: DR, regression, IPW, and stratifying on the PS. And we compare to the causal forest estimator, even though it's not part of the composite. 
+
+Finally, we consider multiple split-sample approaches. The number following the synthetic estimator indicates the number of splits used to estimate it. A zero indicates that no splits were used - standard synthetic estimator. A one indicates the original split-sample approach, where we fit on two halves. A ten indicates that we repeat the split-sample (and fit on each half) ten times. 
+
+# Leacy and Stuart results
+
+Note: I used a log-scale on these results to make clear the differences between the best approaches.
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.width = 8, fig.height = 8}
+library(tidyverse)
+library(here)
+library(glue)
+library(knitr)
+library(magrittr)
+
+sim_parameters <- expand.grid(
+  run = 1:500,
+  j = 1:4,
+  n = c(500, 2000),
+  d = c('ls')
+)
+sim_parameters %<>%
+  mutate(sim = as.character(1:nrow(sim_parameters)))
+
+all_sims <- readRDS(here(glue('results/comparison_sim_ls.rds')))
+theta1 <- map(all_sims, 'all_thetas') %>%
+        bind_rows(.id = 'sim') %>%
+  inner_join(sim_parameters) %>%
+  mutate(j_d = case_when(j == 1 ~ 'Both correct',
+                         j == 2 ~ 'PS model correct',
+                         j == 3 ~ 'Outcome model correct',
+                         j == 4 ~ 'Both models wrong'),
+         estimator = paste0(type, '-', splits))
+mse_res <- theta1 %>%
+        group_by(j_d, n, d, estimator) %>%
+        summarise(mse = mean((ate + 0.4)^2),
+                  bias = mean(ate + 0.4),
+                  var = var(ate))
+      
+      ggplot(mse_res, aes(x = estimator, y = mse)) +
+        geom_col() +
+        facet_wrap(n ~ j_d, scales = 'free_x') +
+        theme_bw() +
+        coord_flip() +
+        ggtitle('MSE') +
+        scale_y_log10()
+      
+      ggplot(mse_res, aes(x = estimator, y = bias)) +
+        geom_col() +
+        facet_wrap(n ~ j_d, scales = 'free_x') +
+        theme_bw() +
+        coord_flip() +
+        ggtitle('Bias') +
+        scale_y_log10()
+
+kable(mse_res %>% arrange(n, mse))
+
+```
+
+### Comparing the coefficients
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
+b1 <- map(all_sims, 'all_bs') %>%
+        bind_rows(.id = 'sim') %>%
+  filter(type != 'raw') %>%
+  inner_join(sim_parameters) %>%
+  mutate(j_d = case_when(j == 1 ~ 'Both correct',
+                         j == 2 ~ 'PS model correct',
+                         j == 3 ~ 'Outcome model correct',
+                         j == 4 ~ 'Both models wrong'),
+         estimator = paste0(type, '-', splits))
+b_sum <- b1 %>%
+        group_by(j_d, n, d, est, estimator) %>%
+        summarise(bhat = mean(b),
+                  bvar = var(b),
+                  b_se = sd(b))
+      print(ggplot(b_sum, 
+                   aes(x = est, y = bhat, 
+                       group = estimator, fill = estimator)) +
+        geom_col(position = 'dodge') +
+        facet_grid(n ~ j_d))
+      
+      print(ggplot(b_sum, aes(x = n, y = b_se, group = est, fill = est)) +
+        geom_col(position = 'dodge') +
+        facet_grid(estimator ~ j_d) +
+          scale_y_sqrt())
+      
+
+
+kable(b_sum %>% arrange( j_d, estimator, est, n))
+```
