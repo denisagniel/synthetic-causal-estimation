@@ -22,28 +22,42 @@ library(tidyverse)
 library(here)
 library(glue)
 library(knitr)
+library(magrittr)
 
-theta1 <- read_csv(here(
-  'results/comparison_sim_thetas_ls.csv'
-)) %>%
+sim_parameters <- expand.grid(
+  run = 1:500,
+  j = 1:4,
+  n = c(500, 2000, 8000),
+  d = c('ls')
+) 
+sim_parameters %<>%
+  mutate(sim = as.character(1:nrow(sim_parameters)))
+
+all_sims <- readRDS(here(glue('results/comparison_sim_ls.rds')))
+theta1 <- map(all_sims, 'thetas') %>%
+        bind_rows(.id = 'sim') %>%
+  inner_join(sim_parameters) %>%
   mutate(j_d = case_when(j == 1 ~ 'Both correct',
                          j == 2 ~ 'PS model correct',
                          j == 3 ~ 'Outcome model correct',
-                         j == 4 ~ 'Both models wrong'))
+                         j == 4 ~ 'Both models wrong'),
+         estimator = 
+           case_when(type == 'raw' ~ theta_0,
+                     TRUE ~ type))
 mse_res <- theta1 %>%
-        group_by(j_d, n, d, type) %>%
+        group_by(j_d, n, d, estimator) %>%
         summarise(mse = mean((ate + 0.4)^2),
                   bias = mean(ate + 0.4),
                   var = var(ate))
       
-      ggplot(mse_res, aes(x = type, y = mse)) +
+      ggplot(mse_res, aes(x = estimator, y = mse)) +
         geom_col() +
         facet_wrap(n ~ j_d, scales = 'free_x') +
         theme_bw() +
         coord_flip() +
         ggtitle('MSE')
       
-      ggplot(mse_res, aes(x = type, y = bias)) +
+      ggplot(mse_res, aes(x = estimator, y = bias)) +
         geom_col() +
         facet_wrap(n ~ j_d, scales = 'free_x') +
         theme_bw() +
@@ -57,9 +71,10 @@ kable(mse_res %>% arrange(n, mse))
 ### Comparing the coefficients
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 8, fig.width = 8}
-b1 <- read_csv(here(
-    'results/comparison_sim_bs_ls.csv'
-)) %>%
+b1 <- map(all_sims, 'bs') %>%
+        bind_rows(.id = 'sim') %>%
+  filter(type != 'raw') %>%
+  inner_join(sim_parameters) %>%
   mutate(j_d = case_when(j == 1 ~ 'Both correct',
                          j == 2 ~ 'PS model correct',
                          j == 3 ~ 'Outcome model correct',
