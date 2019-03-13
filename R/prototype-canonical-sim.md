@@ -60,9 +60,10 @@ Proposed ATE list.
 
 ``` r
   set.seed(s)
-  #'
-  #' Generate the data.
-  #' 
+```
+
+Generate the data.
+``` r
   gen_mod <- generate_data(n = n, dgp = d, 
                            correct_outcome = (j %in% c(1,3)),
                            correct_ps = (j %in% 1:2))
@@ -77,10 +78,11 @@ Proposed ATE list.
 
     ## [1] "data generated.."
 
+
+
+Do the estimation.
+
 ``` r
-  #'
-  #' Do the estimation.
-  #' 
   this_data <- estimate_scores(this_data, outcome_fm = outcome_fm,
                                ps_fm = ps_fm,
                                ps_fam = ps_fam,
@@ -118,10 +120,11 @@ Proposed ATE list.
   predict_delta <- function(d) {
     as.vector(predict(grf_fit, newdata = d)$predictions)
   }
-  #'
-  #' ## How long do the estimators take to fit?
-  #' We can look at how long it takes to resample `r B` of each estimator with $n = 2000$.
-  #'
+```
+## How long do the estimators take to fit?
+We can look at how long it takes to resample 200 of each estimator with $n = 2000$.
+
+``` r
   map(ate_list, function(a) {
     tibble(time = system.time({
       resample_thetas <- 
@@ -167,10 +170,10 @@ Proposed ATE list.
                                  ps_fam = ps_fam,
                                  outcome_fam = outcome_fam,
                                  cov_ids = cov_ids)
-  #'
-  #' It seems that the causal forest is much much slower than all others, and the balancing estimator is also quite slow. 
-  #' 
-  
+```
+It seems that the causal forest is much much slower than all others, and the balancing estimator is also quite slow. 
+
+``` r  
   print('resampling done...')
 ```
 
@@ -179,11 +182,12 @@ Proposed ATE list.
 ``` r
   boot_theta <- resample_thetas[[1]] 
   null_theta <- resample_thetas[[2]] 
-  
-  #'
-  #' ### Form of the object to save
-  #' 
-  #' You can save list columns in data frames, so we can save all of the estimators, all of the bootstrap estimates, and all of the demeaned bootstraps in their own separate columns. 
+```
+
+### Form of the object to save
+
+You can save list columns in data frames, so we can save all of the estimators, all of the bootstrap estimates, and all of the demeaned bootstraps in their own separate columns. 
+``` r
   out_df <- tibble(
     n = n,
     d = d,
@@ -201,11 +205,12 @@ Proposed ATE list.
     ##   <dbl> <chr> <dbl> <dbl> <list>         <list>           <list>           
     ## 1  2000 ls        2     0 <data.frame [… <data.frame [20… <data.frame [200…
 
+
+
+### Working with that object
+
+Then I've written a couple of functions to operate on that data frame. The following function accepts a model object (which stores all of the formulas and variable names for the DGP) and a vector of estimator names. Then it spits out a new function that you can apply to the data frame with all the results to get the combined estimator just for those estimators. You can also pass it additional arguments to pass to the combination function, like which estimator to set as the $\theta_0$. 
 ``` r
-  #'
-  #' ### Working with that object
-  #' 
-  #' Then I've written a couple of functions to operate on that data frame. The following function accepts a model object (which stores all of the formulas and variable names for the DGP) and a vector of estimator names. Then it spits out a new function that you can apply to the data frame with all the results to get the combined estimator just for those estimators. You can also pass it additional arguments to pass to the combination function, like which estimator to set as the $\theta_0$. 
   make_synthetic_fn <- function(gen_mod, ates = NULL, ...) {
     function(theta, boot) {
       if (!is.null(ates)) {
@@ -227,18 +232,18 @@ Proposed ATE list.
         pull(ate)
     }
   }
-  #'
-  #' Then, we can use that function to, for example, create a new function to combine regression, IPW, DR, and balancing, setting DR as $\theta_0$.
-  #' 
+```
+Then, we can use that function to, for example, create a new function to combine regression, IPW, DR, and balancing, setting DR as $\theta_0$.
+``` r 
   my_synth_fn <- make_synthetic_fn(gen_mod, ates = c('ate_regr',
                                                      'ate_ipw_2',
                                                      'ate_dr',
                                                      'ate_bal'),
                                    name_0 = 'ate_dr'
                                    )
-  #'
-  #' Then apply that function to the data frame like so:
-  #' 
+```
+Then apply that function to the data frame like so:
+``` r
   out_df %>%
     mutate(theta_s = unlist(map2(thetahat, boot_theta, my_synth_fn)))
 ```
