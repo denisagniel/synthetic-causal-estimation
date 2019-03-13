@@ -1,7 +1,7 @@
 Prototyping the canonical simulation code
 ================
 dagniel
-Tue Mar 12 14:59:13 2019
+Wed Mar 13 07:55:29 2019
 
 ``` r
 library(knitr)
@@ -26,7 +26,7 @@ Set some simulations settings for demonstration.
   j <- 2
   d <- 'ls'
   s <- 0
-  B <- 10
+  B <- 200
 ```
 
 Proposed ATE list.
@@ -60,8 +60,9 @@ Proposed ATE list.
 
 ``` r
   set.seed(s)
-  # browser()
+  #'
   #' Generate the data.
+  #' 
   gen_mod <- generate_data(n = n, dgp = d, 
                            correct_outcome = (j %in% c(1,3)),
                            correct_ps = (j %in% 1:2))
@@ -77,7 +78,9 @@ Proposed ATE list.
     ## [1] "data generated.."
 
 ``` r
+  #'
   #' Do the estimation.
+  #' 
   this_data <- estimate_scores(this_data, outcome_fm = outcome_fm,
                                ps_fm = ps_fm,
                                ps_fam = ps_fam,
@@ -115,10 +118,10 @@ Proposed ATE list.
   predict_delta <- function(d) {
     as.vector(predict(grf_fit, newdata = d)$predictions)
   }
-  
+  #'
   #' ## How long do the estimators take to fit?
   #' We can look at how long it takes to resample `r B` of each estimator with $n = 2000$.
-  # browser()
+  #'
   map(ate_list, function(a) {
     tibble(time = system.time({
       resample_thetas <- 
@@ -129,29 +132,30 @@ Proposed ATE list.
                     outcome_fm = outcome_fm,
                     ps_fm = ps_fm,
                     ps_fam = ps_fam,
-                    outcome_fam = outcome_fam)
+                    outcome_fam = outcome_fam,
+                    cov_ids = cov_ids)
     })[3])
-  }) %>% bind_rows(.id = 'estimator')
+  }) %>% bind_rows(.id = 'estimator') %>%
+    kable
 ```
 
-    ## # A tibble: 15 x 2
-    ##    estimator    time
-    ##    <chr>       <dbl>
-    ##  1 ipw1         7.79
-    ##  2 ipw2         8.06
-    ##  3 ipw3         7.50
-    ##  4 strat        7.56
-    ##  5 strat_regr   8.80
-    ##  6 match_ps     9.48
-    ##  7 match_prog   9.17
-    ##  8 match_both   9.44
-    ##  9 cal_ps       9.48
-    ## 10 cal_both     9.10
-    ## 11 grf        136.  
-    ## 12 regr         7.22
-    ## 13 dr           7.12
-    ## 14 bal         48.4 
-    ## 15 hdbal        6.86
+| estimator   |      time|
+|:------------|---------:|
+| ipw1        |   158.624|
+| ipw2        |   157.419|
+| ipw3        |   153.306|
+| strat       |   152.628|
+| strat\_regr |   172.123|
+| match\_ps   |   197.943|
+| match\_prog |   200.510|
+| match\_both |   198.570|
+| cal\_ps     |   197.973|
+| cal\_both   |   183.712|
+| grf         |  3044.819|
+| regr        |   146.600|
+| dr          |   147.272|
+| bal         |   888.548|
+| hdbal       |   684.644|
 
 ``` r
   resample_thetas <- resample_fn(dat = this_data,
@@ -161,8 +165,11 @@ Proposed ATE list.
                                  outcome_fm = outcome_fm,
                                  ps_fm = ps_fm,
                                  ps_fam = ps_fam,
-                                 outcome_fam = outcome_fam)
+                                 outcome_fam = outcome_fam,
+                                 cov_ids = cov_ids)
+  #'
   #' It seems that the causal forest is much much slower than all others, and the balancing estimator is also quite slow. 
+  #' 
   
   print('resampling done...')
 ```
@@ -173,8 +180,9 @@ Proposed ATE list.
   boot_theta <- resample_thetas[[1]] 
   null_theta <- resample_thetas[[2]] 
   
-  
+  #'
   #' ### Form of the object to save
+  #' 
   #' You can save list columns in data frames, so we can save all of the estimators, all of the bootstrap estimates, and all of the demeaned bootstraps in their own separate columns. 
   out_df <- tibble(
     n = n,
@@ -191,10 +199,12 @@ Proposed ATE list.
     ## # A tibble: 1 x 7
     ##       n d         j   run thetahat       boot_theta       demeaned_theta   
     ##   <dbl> <chr> <dbl> <dbl> <list>         <list>           <list>           
-    ## 1  2000 ls        2     0 <data.frame [… <data.frame [10… <data.frame [10 …
+    ## 1  2000 ls        2     0 <data.frame [… <data.frame [20… <data.frame [200…
 
 ``` r
+  #'
   #' ### Working with that object
+  #' 
   #' Then I've written a couple of functions to operate on that data frame. The following function accepts a model object (which stores all of the formulas and variable names for the DGP) and a vector of estimator names. Then it spits out a new function that you can apply to the data frame with all the results to get the combined estimator just for those estimators. You can also pass it additional arguments to pass to the combination function, like which estimator to set as the $\theta_0$. 
   make_synthetic_fn <- function(gen_mod, ates = NULL, ...) {
     function(theta, boot) {
@@ -217,15 +227,18 @@ Proposed ATE list.
         pull(ate)
     }
   }
-  
+  #'
   #' Then, we can use that function to, for example, create a new function to combine regression, IPW, DR, and balancing, setting DR as $\theta_0$.
+  #' 
   my_synth_fn <- make_synthetic_fn(gen_mod, ates = c('ate_regr',
                                                      'ate_ipw_2',
                                                      'ate_dr',
                                                      'ate_bal'),
                                    name_0 = 'ate_dr'
                                    )
+  #'
   #' Then apply that function to the data frame like so:
+  #' 
   out_df %>%
     mutate(theta_s = unlist(map2(thetahat, boot_theta, my_synth_fn)))
 ```
@@ -233,4 +246,4 @@ Proposed ATE list.
     ## # A tibble: 1 x 8
     ##       n d         j   run thetahat    boot_theta    demeaned_theta  theta_s
     ##   <dbl> <chr> <dbl> <dbl> <list>      <list>        <list>            <dbl>
-    ## 1  2000 ls        2     0 <data.fram… <data.frame … <data.frame [1…  -0.420
+    ## 1  2000 ls        2     0 <data.fram… <data.frame … <data.frame [2…  -0.414

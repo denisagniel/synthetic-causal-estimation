@@ -101,7 +101,8 @@ opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 7, f
                     outcome_fm = outcome_fm,
                     ps_fm = ps_fm,
                     ps_fam = ps_fam,
-                    outcome_fam = outcome_fam)
+                    outcome_fam = outcome_fam,
+                    cov_ids = cov_ids)
     })[3])
   }) %>% bind_rows(.id = 'estimator') %>%
     kable
@@ -112,7 +113,8 @@ opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 7, f
                                  outcome_fm = outcome_fm,
                                  ps_fm = ps_fm,
                                  ps_fam = ps_fam,
-                                 outcome_fam = outcome_fam)
+                                 outcome_fam = outcome_fam,
+                                 cov_ids = cov_ids)
   #'
   #' It seems that the causal forest is much much slower than all others, and the balancing estimator is also quite slow. 
   #' 
