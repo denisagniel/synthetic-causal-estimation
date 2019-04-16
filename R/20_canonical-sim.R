@@ -145,6 +145,7 @@ sim_res <- Q(sim_fn,
                ate_list = ate_list,
                B = 200,
                tmpdir = tmpdir),
+             fail_on_error = FALSE,
              n_jobs = 25
 )
 saveRDS(sim_res, 
