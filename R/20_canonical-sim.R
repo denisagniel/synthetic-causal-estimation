@@ -8,7 +8,7 @@ opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 7, f
 
 #'
 remotes::install_github('denisagniel/synthate')  
-tmpdir <- '/n/data1/hms/dbmi/zaklab/dma12/synthetic-causal-estimation/tmp'
+tmpdir <- '/n/data1/hms/dbmi/zaklab/dma12/synthetic-causal-estimation/tmp/'
 fs::dir_create(tmpdir)
 
 library(splines)
