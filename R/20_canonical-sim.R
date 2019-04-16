@@ -54,7 +54,7 @@ sim_params <- expand.grid(
   #'
   #' Specify simulation function.
   #' 
-sim_fn <- function(n, j, d, s, ate_list, B) {
+sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
   library(splines)
   library(stringr)
   library(purrr)
@@ -143,7 +143,8 @@ sim_res <- Q(sim_fn,
              s = sim_params$run,
              const = list(
                ate_list = ate_list,
-               B = 200),
+               B = 200,
+               tmpdir = tmpdir),
              n_jobs = 25
 )
 saveRDS(sim_res, 
