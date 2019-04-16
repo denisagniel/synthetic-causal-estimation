@@ -64,6 +64,7 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
   library(synthate)
   library(grf)
   library(glue)
+  select <- dplyr::select
   print(
     glue::glue('Sample size is {n}; the outcome is {(j %in% c(1,3))}; the PS is {(j %in% c(1,2))}; the DGP is {d}; the seed is {s}.')
   )
@@ -95,7 +96,7 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
                             outcome_fm = stringr::str_c('d + ', outcome_fm),
                             outcome_fam = outcome_fam)
   print('initial thetas estimated...')
-  X <- this_data %>% select(one_of(cov_ids))
+  X <- this_data %>% dplyr::select(one_of(cov_ids))
   W <- this_data %>% pull(d)
   Y <- this_data$y
   
