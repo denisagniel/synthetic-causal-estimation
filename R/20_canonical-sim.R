@@ -26,7 +26,7 @@ library(glue)
 sim_params <- expand.grid(
   dgp = c('ks', 'ld', 'ls', 'ik', 'fi', 'iw', 'pa'),
   j = 1:4,
-  n = c(500, 2000, 8000),
+  n = c(500, 2000, 5000),
   run = 1:3
 )
 #'  
@@ -147,7 +147,7 @@ sim_res <- Q(sim_fn,
                B = 200,
                tmpdir = tmpdir),
              fail_on_error = FALSE,
-             n_jobs = 25
+             n_jobs = 30
 )
 saveRDS(sim_res, 
         here(glue('results/canonical_sim.rds'))
