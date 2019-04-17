@@ -27,7 +27,7 @@ sim_params <- expand.grid(
   dgp = c('ks', 'ld', 'ls', 'ik', 'fi', 'iw', 'pa'),
   j = 1:4,
   n = c(500, 2000, 5000),
-  run = 1:3
+  run = 1:1000
 )
 #'  
 #' Proposed ATE list. 
@@ -147,14 +147,11 @@ sim_res <- Q(sim_fn,
                B = 200,
                tmpdir = tmpdir),
              fail_on_error = FALSE,
-             n_jobs = 30
+             n_jobs = 1000
 )
 saveRDS(sim_res, 
         here(glue('results/canonical_sim.rds'))
 )
 fs::dir_delete(tmpdir)
-sim_tib <- bind_rows(sim_res)
-saveRDS(sim_tib, 
-        here(glue('results/canonical_sim.csv'))
-)
+
 sessionInfo()
