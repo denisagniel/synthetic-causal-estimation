@@ -56,55 +56,7 @@ ate_list <- list(
 #'
 #' 
 
-inside_fn <- function(gen_mod, boot = FALSE, ate_list, B) {
-  this_data <- gen_mod$data
-  if (boot) {
-    this_data <- this_data %>%
-      sample_frac
-  }
-  outcome_fm <- gen_mod$outcome_fm
-  outcome_fam <- gen_mod$outcome_fam
-  ps_fm <- gen_mod$ps_fm
-  ps_fam <- gen_mod$ps_fam
-  cov_ids <- gen_mod$cov_ids
-  print('data generated..')
-  #'
-  #' Do the estimation.
-  #' 
-  this_data <- estimate_scores(this_data, outcome_fm = outcome_fm,
-                               ps_fm = ps_fm,
-                               ps_fam = ps_fam,
-                               outcome_fam = outcome_fam)
-  print('scores estimated...')
-  thetahat <- estimate_ates(this_data,
-                            ate_list,
-                            cov_ids = cov_ids,
-                            outcome_fm = stringr::str_c('d + ', outcome_fm),
-                            outcome_fam = outcome_fam)
-  print('initial thetas estimated...')
-    predict_delta <- function(d) {
-      d$y
-    }
-  
-  
-  #'
-  
-  resample_thetas <- resample_fn(dat = this_data,
-                                 dpredfn = predict_delta,
-                                 B = B,
-                                 ate_list = ate_list,
-                                 outcome_fm = outcome_fm,
-                                 ps_fm = ps_fm,
-                                 ps_fam = ps_fam,
-                                 outcome_fam = outcome_fam,
-                                 cov_ids = cov_ids)
-  
-  print('resampling done...')
-  boot_theta <- resample_thetas[[1]] 
-  
-  thetahat_s <- synthetic_subset(thetahat, boot = boot_theta)
-  thetahat_s
-}
+
  
 sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
   library(splines)
@@ -127,6 +79,56 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
   gen_mod <- generate_data(n = n, dgp = d, 
                            correct_outcome = (j %in% c(1,3)),
                            correct_ps = (j %in% 1:2))
+  
+  inside_fn <- function(gen_mod, boot = FALSE, ate_list, B) {
+    this_data <- gen_mod$data
+    if (boot) {
+      this_data <- this_data %>%
+        sample_frac
+    }
+    outcome_fm <- gen_mod$outcome_fm
+    outcome_fam <- gen_mod$outcome_fam
+    ps_fm <- gen_mod$ps_fm
+    ps_fam <- gen_mod$ps_fam
+    cov_ids <- gen_mod$cov_ids
+    print('data generated..')
+    #'
+    #' Do the estimation.
+    #' 
+    this_data <- estimate_scores(this_data, outcome_fm = outcome_fm,
+                                 ps_fm = ps_fm,
+                                 ps_fam = ps_fam,
+                                 outcome_fam = outcome_fam)
+    print('scores estimated...')
+    thetahat <- estimate_ates(this_data,
+                              ate_list,
+                              cov_ids = cov_ids,
+                              outcome_fm = stringr::str_c('d + ', outcome_fm),
+                              outcome_fam = outcome_fam)
+    print('initial thetas estimated...')
+    predict_delta <- function(d) {
+      d$y
+    }
+    
+    
+    #'
+    
+    resample_thetas <- resample_fn(dat = this_data,
+                                   dpredfn = predict_delta,
+                                   B = B,
+                                   ate_list = ate_list,
+                                   outcome_fm = outcome_fm,
+                                   ps_fm = ps_fm,
+                                   ps_fam = ps_fam,
+                                   outcome_fam = outcome_fam,
+                                   cov_ids = cov_ids)
+    
+    print('resampling done...')
+    boot_theta <- resample_thetas[[1]] 
+    
+    thetahat_s <- synthetic_subset(thetahat, boot = boot_theta)
+    thetahat_s
+  }
   
   initial_theta_s <- inside_fn(gen_mod, boot = FALSE,
                                ate_list, B)
