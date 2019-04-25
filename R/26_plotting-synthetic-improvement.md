@@ -5,7 +5,7 @@ dagniel
 
 ``` r
 library(knitr)
-opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 7, fig.height = 7)
+opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 15, fig.height = 5)
 ```
 
 ``` r
