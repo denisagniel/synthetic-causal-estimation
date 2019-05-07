@@ -1,12 +1,4 @@
-#' ---
-#' title: "Canonical double boot simulation"
-#' output: github_document
-#' ---
-#' 
-library(knitr)
-opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.width = 7, fig.height = 7)
 
-#'
 remotes::install_github('denisagniel/synthate')  
 tmpdir <- '/n/data1/hms/dbmi/zaklab/dma12/synthetic-causal-estimation/tmp-boot/'
 fs::dir_create(tmpdir)
@@ -26,8 +18,8 @@ library(glue)
 sim_params <- expand.grid(
   j = 1,
   n = c(500, 2000),
-  dgp = c('ks', 'ld'),
-  run = 1:1000
+  dgp = c('ks', 'ld', 'ls'),
+  run = 1:3
 )
 #'  
 #' Proposed ATE list. 
@@ -72,6 +64,7 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
   print(
     glue::glue('Sample size is {n}; the outcome is {(j %in% c(1,3))}; the PS is {(j %in% c(1,2))}; the DGP is {d}; the seed is {s}.')
   )
+  # browser()
   set.seed(s)
   #'
   #' Generate the data.
@@ -147,9 +140,16 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
   out_df <- initial_theta_s %>%
     inner_join(boot_res)
   saveRDS(out_df, 
-          glue(tmpdir,'tmp-res_n-{n}_d-{d}_j-{j}_s-{s}.rds'))
+          glue(tmpdir,'tmp-res_n-{n}_d-{d}_j-{j}_s-{s}_B-{B}.rds'))
+  out_df
 }  
 
+options(
+  clustermq.defaults = list(ptn="short",
+                            log_file="Rout/log%a.log",
+                            time_amt = "12:00:00"
+  )
+)
 sim_res <- Q(sim_fn, 
              j = sim_params$j,
              n = sim_params$n,
@@ -160,7 +160,7 @@ sim_res <- Q(sim_fn,
                B = 200,
                tmpdir = tmpdir),
              fail_on_error = FALSE,
-             n_jobs = 250
+             n_jobs = 5
 )
 saveRDS(sim_res, 
         here(glue('results/canonical-double-boot-sim.rds'))
