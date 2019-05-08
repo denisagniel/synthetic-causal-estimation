@@ -16,10 +16,10 @@ library(glue)
 #' Set up simulations settings.
 #' 
 sim_params <- expand.grid(
-  j = 1,
-  n = c(500, 2000),
-  dgp = c('ks', 'ld', 'ls'),
-  run = 1:3
+  j = 1:2,
+  n = c(500),
+  dgp = c('ks', 'ld'),
+  run = 1:1000
 )
 #'  
 #' Proposed ATE list. 
@@ -145,9 +145,9 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
 }  
 
 options(
-  clustermq.defaults = list(ptn="short",
+  clustermq.defaults = list(ptn="medium",
                             log_file="Rout/log%a.log",
-                            time_amt = "12:00:00"
+                            time_amt = "120:00:00"
   )
 )
 sim_res <- Q(sim_fn, 
