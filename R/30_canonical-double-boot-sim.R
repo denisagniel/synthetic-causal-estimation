@@ -160,7 +160,7 @@ sim_res <- Q(sim_fn,
                B = 200,
                tmpdir = tmpdir),
              fail_on_error = FALSE,
-             n_jobs = 5
+             n_jobs = 250
 )
 saveRDS(sim_res, 
         here(glue('results/canonical-double-boot-sim.rds'))
