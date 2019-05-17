@@ -77,7 +77,7 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
     this_data <- gen_mod$data
     if (boot) {
       this_data <- this_data %>%
-        sample_frac
+        sample_frac(replace = TRUE)
     }
     outcome_fm <- gen_mod$outcome_fm
     outcome_fam <- gen_mod$outcome_fam
