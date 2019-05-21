@@ -70,6 +70,16 @@ ggplot(combined_mses %>% filter(d != 'ik'),
   ggtitle('Percent change in MSE',
           subtitle = 'Comparing synthetic estimator to theta_0')
 
+ggplot(combined_mses %>% filter(d != 'ik'),
+       aes(x = theta_0, y = improvement, group = theta_0)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = scales::percent) +
+  facet_wrap(~ j_n) +
+  theme_bw() +
+  labs(y = 'Percent change in MSE', x = '') +
+  ggtitle('Percent change in MSE',
+          subtitle = 'Comparing synthetic estimator to theta_0')
+
 ### Comparing using regression as theta_0 to all the candidate estimators
 
 #' The previous analyses looked at all possible $\theta_0$s. Here, we can choose a particular $\theta_0$ and compare to all candidates. Let's see what results look like if we use the regression estimator as $\theta_0$. We'll again exclude Iacus and King.
