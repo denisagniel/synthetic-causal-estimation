@@ -69,7 +69,6 @@ tree_sim <- function(ate_list, n, j, d, B, s) {
   # browser()
   resample_thetas <- 
     resample_fn(dat = this_data,
-                ypredfn = predict_y,
                 dpredfn = predict_delta,
                 B = B,
                 ate_list = ate_list,
@@ -190,16 +189,16 @@ sim_parameters <- expand.grid(
   d = c('ls', 'iw')
 )
 
-tree_sim(j = 2,
-                  n = 500,
-                  s = 1,
-                  ate_list = list(
-                    ipw2_ate,
-                    regr_ate,
-                    dr_ate,
-                    strat_ate),
-                  B = 20,
-                  d = 'ls')
+# tree_sim(j = 2,
+#                   n = 500,
+#                   s = 1,
+#                   ate_list = list(
+#                     ipw2_ate,
+#                     regr_ate,
+#                     dr_ate,
+#                     strat_ate),
+#                   B = 20,
+#                   d = 'ls')
 for (dd in c('ls', 'iw')) {
       this_sim <- sim_parameters %>%
         filter(d == dd) 
