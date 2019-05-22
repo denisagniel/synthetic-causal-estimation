@@ -37,13 +37,20 @@ full_res <- bind_rows(sim_res) %>%
 res_sum <- full_res %>%
   group_by(theta_0, n, j, d) %>%
   summarise(true_var = var(ate),
-            est_var = mean(var),
+            asymp_var = mean(var),
+            boot_var = mean(boot_var),
             true_se = sd(ate),
-            est_se = mean(sqrt(var)),
+            asymp_se = mean(sqrt(var)),
+            boot_se = mean(sqrt(boot_var)),
             bias = mean(ate - true_ate),
-            ci_coverage = mean(ate - 1.96*sqrt(var) < true_ate &
+            asymp_ci_coverage = mean(ate - 1.96*sqrt(var) < true_ate &
                                  ate + 1.96*sqrt(var) > true_ate),
+            boot_nci_coverage = mean(ate - 1.96*sqrt(boot_var) < true_ate &
+                                       ate + 1.96*sqrt(boot_var) > true_ate),
+            boot_qci_coverage = mean(boot_q_l < true_ate &
+                                       boot_q_h > true_ate),
             nsim = n()) %>%
   ungroup %>%
-  mutate(se_ratio = est_se/true_se)
+  mutate(asymp_se_ratio = asymp_se/true_se,
+         boot_se_ratio = boot_se/true_se)
 readr::write_csv(res_sum, here('results/prelim_asymptotic-var-results.csv'))
