@@ -28,7 +28,7 @@ sim_params <- expand.grid(
   dgp = c('ks', 'ld', 'ls', 'ik', 'fi', 'iw', 'pa'),
   j = 1:4,
   n = c(500, 2000, 5000),
-  run = 1:1000
+  run = 1:3
 )
 #'  
 #' Proposed ATE list. 
@@ -135,6 +135,13 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
           glue(tmpdir,'tmp-split-sample-res_n-{n}_d-{d}_j-{j}_s-{s}.rds'))
 }  
 
+options(
+  clustermq.defaults = list(ptn="short",
+                            log_file="Rout/log%a.log",
+                            time_amt = "1:00:00"
+  )
+)
+
 sim_res <- Q(sim_fn, 
              j = sim_params$j,
              n = sim_params$n,
@@ -145,7 +152,7 @@ sim_res <- Q(sim_fn,
                B = 200,
                tmpdir = tmpdir),
              fail_on_error = FALSE,
-             n_jobs = 1000
+             n_jobs = 10
 )
 saveRDS(sim_res, 
         here(glue('results/canonical-split-sample_sim.rds'))
