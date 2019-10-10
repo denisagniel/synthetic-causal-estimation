@@ -11,4 +11,4 @@
 module load gcc/6.2.0
 module load R/3.4.1
 module load pandoc/2.1.1
-R CMD BATCH --no-save 50_canonical-split-sample_sim.R Rout/50_split-sample.Rout
+R CMD BATCH --no-save 50_canonical-split-sample-sim.R Rout/50_split-sample.Rout
