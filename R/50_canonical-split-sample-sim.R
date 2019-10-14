@@ -130,9 +130,9 @@ sim_fn <- function(n, j, d, s, ate_list, B, tmpdir) {
     a_thetahat = list(a_thetahat),
     b_thetahat = list(b_thetahat)
   )
-  out_df
   saveRDS(out_df, 
           glue(tmpdir,'tmp-split-sample-res_n-{n}_d-{d}_j-{j}_s-{s}.rds'))
+  out_df
 }  
 
 options(
