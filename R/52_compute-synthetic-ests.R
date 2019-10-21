@@ -19,7 +19,7 @@ options(
 )
 
 sim_out <- sim_res %>%
-  mutate(synth_ests = Q_rows(tst, synthetic_subset,n_jobs = 100))
+  mutate(synth_ests = Q_rows(sim_res, synthetic_subset,n_jobs = 100))
 sim_out <- sim_out %>%
   select(-boot, -demeaned_theta) %>%
   unnest(synth_ests)
