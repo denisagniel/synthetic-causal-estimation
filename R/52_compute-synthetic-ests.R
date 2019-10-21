@@ -1,3 +1,4 @@
+devtools::install_github('denisagniel/synthate')
 library(tidyverse)
 library(here)
 library(glue)
