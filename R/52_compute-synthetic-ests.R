@@ -18,8 +18,17 @@ options(
   )
 )
 
+thisfn <- function(theta, boot, estimators = NULL, ...) {
+  library(tidyverse)
+  library(here)
+  library(glue)
+  library(synthate)
+  
+  synthetic_subset(theta, boot, estimators, ...)
+}
+
 sim_out <- sim_res %>%
-  mutate(synth_ests = Q_rows(sim_res, synthetic_subset,n_jobs = 100))
+  mutate(synth_ests = Q_rows(sim_res, thisfn,n_jobs = 100))
 sim_out <- sim_out %>%
   select(-boot, -demeaned_theta) %>%
   unnest(synth_ests)
