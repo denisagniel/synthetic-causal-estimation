@@ -3,10 +3,10 @@ library(tidyverse)
 library(here)
 library(glue)
 library(synthate)
-library(patchwork)
 library(clustermq)
 
-sim_res <- read_rds(here('results/canonical-sim-results.rds')) %>%
+sim_res <- read_rds(here('results/canonical_sim.rds'))
+sim_res <- bind_rows(sim_res) %>%
   filter(d != 'ik') %>%
   rename(theta = thetahat,
          boot = boot_theta)
