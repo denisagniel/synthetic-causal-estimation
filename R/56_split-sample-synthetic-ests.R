@@ -24,19 +24,19 @@ options(
                             time_amt = "1:00:00"
   )
 )
-
-thisfn <- function(thetahat_a,thetahat_b, boot, estimators = NULL, ...) {
-  library(tidyverse)
-  library(here)
-  library(glue)
-  library(synthate)
-  
-  synthate::synthetic_split_subset(thetahat_a, thetahat_b, boot, estimators, ...)
-}
+# 
+# thisfn <- function(thetahat_a,thetahat_b, boot, estimators = NULL) {
+#   library(tidyverse)
+#   library(here)
+#   library(glue)
+#   library(synthate)
+#   
+#   synthetic_split_subset(thetahat_a, thetahat_b, boot, estimators)
+# }
 
 sim_out <- sim_res %>%
-  mutate(split_sample_ests = Q_rows(sim_res, thisfn,n_jobs = 100))
+  mutate(split_sample_ests = Q_rows(sim_res, synthate::synthetic_split_subset,n_jobs = 100))
 sim_out <- sim_out %>%
-  select(-boot, -demeaned_theta) %>%
+  select(-boot) %>%
   unnest(split_sample_ests)
 write_rds(sim_out, here('results/synthetic-ests_split-sample.rds'))
