@@ -5,7 +5,10 @@ library(glue)
 library(synthate)
 library(clustermq)
 
-main_res <- read_rds(here('results/canonical-sim-results.rds'))
+main_res <- read_rds(here('results/canonical_sim.rds')) %>%
+  bind_rows %>%
+  filter(d != 'ik') %>%
+  select(-thetahat, -demeaned_theta)
 sim_res <- read_rds(here('results/canonical-split-sample_sim.rds'))
 sim_res <- keep(sim_res, ~ all(class(.) != 'error'))
 sim_res <- bind_rows(sim_res) %>%
@@ -22,13 +25,13 @@ options(
   )
 )
 
-thisfn <- function(theta, boot, estimators = NULL, ...) {
+thisfn <- function(thetahat_a,thetahat_b, boot, estimators = NULL, ...) {
   library(tidyverse)
   library(here)
   library(glue)
   library(synthate)
   
-  synthate::synthetic_split_subset(a_thetahat, b_thetahat, boot, estimators, ...)
+  synthate::synthetic_split_subset(thetahat_a, thetahat_b, boot, estimators, ...)
 }
 
 sim_out <- sim_res %>%
