@@ -35,6 +35,6 @@ thisfn <- function(theta, boot, estimators = NULL, ...) {
 sim_out <- sim_res %>%
   mutate(synth_ests = Q_rows(sim_res, thisfn,n_jobs = 100))
 sim_out <- sim_out %>%
-  select(-boot, -demeaned_theta) %>%
+  select(-boot, -boot_theta) %>%
   unnest(synth_ests)
 write_rds(sim_out, here('results/synthetic-ests_external.rds'))
